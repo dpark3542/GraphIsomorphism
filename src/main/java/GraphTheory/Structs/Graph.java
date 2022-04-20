@@ -1,4 +1,4 @@
-package GraphIsomorphism;
+package GraphTheory.Structs;
 
 import java.util.List;
 

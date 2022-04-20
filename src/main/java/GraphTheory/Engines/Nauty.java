@@ -1,4 +1,6 @@
-import GraphIsomorphism.Graph;
+package GraphTheory.Engines;
+
+import GraphTheory.Structs.Graph;
 
 import java.io.BufferedReader;
 import java.io.IOException;

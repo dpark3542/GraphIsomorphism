@@ -1,4 +1,8 @@
-package GraphIsomorphism;
+package GraphTheory.Utilities;
+
+import GraphTheory.Structs.AdjacencyListGraph;
+import GraphTheory.Structs.AdjacencyMatrixGraph;
+import GraphTheory.Structs.Graph;
 
 import java.util.ArrayList;
 import java.util.List;

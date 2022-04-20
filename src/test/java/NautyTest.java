@@ -1,9 +1,10 @@
+import GraphTheory.Engines.Nauty;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static GraphIsomorphism.GraphGenerator.completeGraph;
-import static GraphIsomorphism.GraphGenerator.cycleGraph;
+import static GraphTheory.Utilities.GraphGenerator.completeGraph;
+import static GraphTheory.Utilities.GraphGenerator.cycleGraph;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NautyTest {

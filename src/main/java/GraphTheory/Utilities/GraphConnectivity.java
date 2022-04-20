@@ -1,9 +1,11 @@
-package GraphIsomorphism;
+package GraphTheory.Utilities;
+
+import GraphTheory.Structs.Graph;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-public final class GraphUtil {
+public final class GraphConnectivity {
     public static boolean isConnected(Graph g) {
         int n = g.getNumVertices();
         boolean[] mkd = new boolean[n];

@@ -16,11 +16,27 @@ public class AdjacencyMatrixGraph implements Graph {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 g[i][j] = m[i][j];
-                if (m[i][j] != m[j][i]) {
+            }
+        }
+        check();
+    }
+
+    private void check() {
+        for (int i = 0; i < n; i++) {
+            if (g[i][i]) {
+                throw new IllegalArgumentException();
+            }
+            for (int j = i + 1; j < n; j++) {
+                if (g[i][j] != g[j][i]) {
                     throw new IllegalArgumentException();
                 }
             }
         }
+    }
+
+    @Override
+    public int getNumVertices() {
+        return n;
     }
 
     @Override

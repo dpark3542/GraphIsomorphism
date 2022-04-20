@@ -10,7 +10,7 @@ public class Permutation {
     public Permutation(List<Cycle> cycles) {
         n = cycles.size();
         this.cycles = List.copyOf(cycles);
-        checkDisjoint();
+        check();
     }
 
     public Permutation(Cycle... cycles) {
@@ -19,12 +19,11 @@ public class Permutation {
         for (Cycle c : cycles) {
             this.cycles.add(c);
         }
-        checkDisjoint();
+        check();
     }
 
-    // TODO:
-    private void checkDisjoint() {
-
+    private void check() {
+        // TODO: check disjointness
     }
 
     @Override

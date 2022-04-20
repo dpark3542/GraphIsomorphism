@@ -3,11 +3,14 @@ package GroupTheory.Engines;
 import GroupTheory.Structs.Group;
 import GroupTheory.Structs.Permutation;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 public class GAP implements GroupTheoryEngine {
     private final Process process;
-    private final BufferedReader in, err;
+    private final BufferedReader in;
     private final PrintWriter out;
 
     private final String initialPrompt = " Try";
@@ -20,13 +23,13 @@ public class GAP implements GroupTheoryEngine {
         process = processBuilder.start();
         in = new BufferedReader(new InputStreamReader(process.getInputStream()));
         out = new PrintWriter(process.getOutputStream());
-        err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-        // don't break GAP output into multiple lines
+        // read initial input
         String line = in.readLine();
         while (!line.startsWith(initialPrompt)) {
             line = in.readLine();
         }
+        // don't break GAP output into multiple lines
         out.println(outFormat);
         out.flush();
     }

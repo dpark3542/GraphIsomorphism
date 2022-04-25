@@ -5,20 +5,17 @@ import java.util.List;
 
 public class Permutation {
     private final int n;
-    private final List<Cycle> cycles;
+    private final Cycle[] cycles;
 
     public Permutation(List<Cycle> cycles) {
         n = cycles.size();
-        this.cycles = List.copyOf(cycles);
+        this.cycles = (Cycle[]) cycles.toArray();
         check();
     }
 
     public Permutation(Cycle... cycles) {
         n = cycles.length;
-        this.cycles = new ArrayList<>(n);
-        for (Cycle c : cycles) {
-            this.cycles.add(c);
-        }
+        this.cycles = cycles;
         check();
     }
 

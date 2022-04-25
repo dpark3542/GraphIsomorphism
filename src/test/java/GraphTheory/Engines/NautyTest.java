@@ -1,3 +1,5 @@
+package GraphTheory.Engines;
+
 import GraphTheory.Engines.Nauty;
 import org.junit.jupiter.api.Test;
 

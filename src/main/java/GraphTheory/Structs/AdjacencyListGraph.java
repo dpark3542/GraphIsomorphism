@@ -1,6 +1,7 @@
 package GraphTheory.Structs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class AdjacencyListGraph implements Graph {
@@ -44,6 +45,6 @@ public class AdjacencyListGraph implements Graph {
 
     @Override
     public List<Integer> getNeighbors(int v) {
-        return List.copyOf(g.get(v));
+        return Collections.unmodifiableList(g.get(v));
     }
 }

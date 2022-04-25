@@ -1,37 +1,48 @@
 package GroupTheory.Engines;
 
-import GroupTheory.Structs.Group;
-import GroupTheory.Structs.Permutation;
+import GroupTheory.Structs.*;
+import Parser.NestedParser;
+import Parser.Node;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 
 public class GAP implements GroupTheoryEngine {
+    private final boolean log;
     private final Process process;
     private final BufferedReader in;
     private final PrintWriter out;
 
-    private final String initialPrompt = " Try";
-    private final String outFormat = "SetPrintFormattingStatus(\"*stdout*\", false);;";
+    private static final String initialPrompt = " Try";
+    private static final String outFormat = "SetPrintFormattingStatus(\"*stdout*\", false);;";
 
+    public GAP(String location, boolean log) {
+        try {
+            this.log = log;
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command(location);
+            process = processBuilder.start();
+            in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            out = new PrintWriter(process.getOutputStream());
 
-    public GAP(String location) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(location);
-        process = processBuilder.start();
-        in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        out = new PrintWriter(process.getOutputStream());
-
-        // read initial input
-        String line = in.readLine();
-        while (!line.startsWith(initialPrompt)) {
-            line = in.readLine();
+            // read initial input
+            String line = in.readLine();
+            while (!line.startsWith(initialPrompt)) {
+                line = in.readLine();
+            }
+            // don't break GAP output into multiple lines
+            out.println(outFormat);
+            out.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        // don't break GAP output into multiple lines
-        out.println(outFormat);
-        out.flush();
+    }
+
+    public GAP(String location) {
+        this(location, false);
     }
 
     private String read() {
@@ -42,12 +53,14 @@ public class GAP implements GroupTheoryEngine {
             }
             return line;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     private void write(String s) {
+        if (log) {
+            System.out.println("GAP: " + s);
+        }
         out.println(s);
         out.flush();
     }
@@ -60,12 +73,38 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public boolean isMember(Permutation p, Group g) {
-        return false;
+        write(p.toString() + " in " + g.toString() + ';');
+        return Boolean.parseBoolean(read());
     }
 
-    public void close() throws IOException {
-        in.close();
-        out.close();
-        process.destroy();
+    @Override
+    public List<Domain> getOrbits(Group g, Domain d) {
+        write("OrbitsDomain(" + g.toString() + ", " + d.toString() + ", OnSets);");
+
+        // TODO:
+//        Node tree = NestedParser.parse(read());
+
+        System.out.println(read());
+        return null;
+    }
+
+    @Override
+    public Group getPointwiseStabilizer(Group g, Domain d) {
+        return null;
+    }
+
+    @Override
+    public Domain getMinimalBlockSystem(Group g, Domain d) {
+        return null;
+    }
+
+    public void close() {
+        try {
+            in.close();
+            out.close();
+            process.destroy();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

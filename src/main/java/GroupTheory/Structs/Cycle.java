@@ -7,20 +7,20 @@ import java.util.Set;
 
 public class Cycle {
     private final int n;
-    private final List<Integer> cycle;
+    private final int[] cycle;
 
     public Cycle(List<Integer> cycle) {
         n = cycle.size();
-        this.cycle = List.copyOf(cycle);
+        this.cycle = new int[n];
+        for (int i = 0; i < n; i++) {
+            this.cycle[i] = cycle.get(i);
+        }
         check();
     }
 
     public Cycle(int... cycle) {
         n = cycle.length;
-        this.cycle = new ArrayList<>(n);
-        for (int x : cycle) {
-            this.cycle.add(x);
-        }
+        this.cycle = cycle;
         check();
     }
 
@@ -39,10 +39,10 @@ public class Cycle {
         StringBuilder sb = new StringBuilder();
         sb.append('(');
         for (int i = 0; i < n - 1; i++) {
-            sb.append(cycle.get(i));
+            sb.append(cycle[i]);
             sb.append(',');
         }
-        sb.append(cycle.get(n - 1));
+        sb.append(cycle[n - 1]);
         sb.append(')');
         return sb.toString();
     }

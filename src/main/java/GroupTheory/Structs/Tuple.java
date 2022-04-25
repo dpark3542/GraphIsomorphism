@@ -2,41 +2,76 @@ package GroupTheory.Structs;
 
 import java.util.*;
 
+/**
+ * A tuple is a set of integers.
+ * Implemented with a sorted array since the tuple is unlikely to be large enough to justify using a HashSet.
+ */
 public class Tuple {
     private final int n;
-    private final Set<Integer> tuple;
+    private final int[] tuple;
 
-    public Tuple(List<Integer> tuple) {
+    public Tuple(Collection<Integer> tuple) {
         n = tuple.size();
-        this.tuple = new HashSet<>(tuple);
-    }
-
-    public Tuple(Set<Integer> tuple) {
-        n = tuple.size();
-        this.tuple = Set.copyOf(tuple);
+        this.tuple = new int[n];
+        int i = 0;
+        for (int x : tuple) {
+            this.tuple[i] = x;
+            i++;
+        }
+        Arrays.sort(this.tuple);
+        check();
     }
 
     public Tuple(int... tuple) {
         n = tuple.length;
-        this.tuple = new HashSet<>(n);
-        for (int x : tuple) {
-            this.tuple.add(x);
-        }
+        this.tuple = tuple;
+        Arrays.sort(this.tuple);
+        check();
+    }
+
+    private void check() {
+        // TODO: check for duplicates since we are not using HashSet anymore
     }
 
     @Override
     public String toString() {
-        List<Integer> list = new ArrayList<>(tuple);
-        Collections.sort(list);
-
         StringBuilder sb = new StringBuilder();
-        sb.append('{');
+        sb.append('[');
         for (int i = 0; i < n - 1; i++) {
-            sb.append(list.get(i));
+            sb.append(tuple[i]);
             sb.append(',');
         }
-        sb.append(list.get(n - 1));
-        sb.append('}');
+        sb.append(tuple[n - 1]);
+        sb.append(']');
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+//        else if (n == 1 && (obj instanceof Integer)) {
+//            return tuple.contains(obj);
+//        }
+        else if (!(obj instanceof Tuple t)) {
+            return false;
+        }
+        else {
+            if (n != t.n) {
+                return false;
+            }
+            for (int i = 0; i < n; i++) {
+                if (tuple[i] != t.tuple[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(tuple);
     }
 }

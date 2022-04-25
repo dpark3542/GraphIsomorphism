@@ -1,7 +1,10 @@
 package GroupTheory.Engines;
 
+import GroupTheory.Structs.Domain;
 import GroupTheory.Structs.Group;
 import GroupTheory.Structs.Permutation;
+
+import java.util.List;
 
 public class Native implements GroupTheoryEngine {
     @Override
@@ -12,5 +15,25 @@ public class Native implements GroupTheoryEngine {
     @Override
     public boolean isMember(Permutation p, Group g) {
         return false;
+    }
+
+    @Override
+    public List<Domain> getOrbits(Group g, Domain d) {
+        return null;
+    }
+
+    @Override
+    public Group getPointwiseStabilizer(Group g, Domain d) {
+        return null;
+    }
+
+    @Override
+    public Domain getMinimalBlockSystem(Group g, Domain d) {
+        return null;
+    }
+
+    @Override
+    public void close() {
+
     }
 }

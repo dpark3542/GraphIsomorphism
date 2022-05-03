@@ -82,7 +82,7 @@ public class GAP implements GroupTheoryEngine {
         write("OrbitsDomain(" + g.toString() + ", " + d.toString() + ", OnSets);");
 
         // TODO:
-//        Node tree = NestedParser.parse(read());
+//        Node tree = NestedParser.parse(read(), "[]");
 
         System.out.println(read());
         return null;

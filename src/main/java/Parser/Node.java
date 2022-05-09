@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Node {
-    private String value;
+public class Node implements Iterable<Node> {
+    private long value;
     private final List<Node> children;
 
     Node() {
-        this.value = null;
+        this.value = 0;
         children = new ArrayList<>();
     }
 
@@ -17,7 +17,7 @@ public class Node {
         return children.isEmpty();
     }
 
-    void setValue(String value) {
+    void setValue(long value) {
         this.value = value;
     }
 
@@ -25,18 +25,19 @@ public class Node {
         children.add(child);
     }
 
-    public String getValue() {
+    public long getValue() {
         return value;
     }
 
-    public Iterator<Node> getChildren() {
+    @Override
+    public Iterator<Node> iterator() {
         return children.iterator();
     }
 
     @Override
     public String toString() {
         if (isLeaf()) {
-            return "[" + value + "]";
+            return Long.toString(value);
         }
         else {
             StringBuilder sb = new StringBuilder();

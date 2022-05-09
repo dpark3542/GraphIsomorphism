@@ -1,6 +1,7 @@
 package GroupTheory.Structs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Permutation {
@@ -15,7 +16,7 @@ public class Permutation {
 
     public Permutation(Cycle... cycles) {
         n = cycles.length;
-        this.cycles = cycles;
+        this.cycles = Arrays.copyOf(cycles, n);
         check();
     }
 

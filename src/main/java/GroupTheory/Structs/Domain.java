@@ -1,6 +1,5 @@
 package GroupTheory.Structs;
 
-public interface Domain {
-    boolean inDomain(int x);
+public interface Domain extends Iterable<Tuple> {
     boolean inDomain(Tuple t);
 }

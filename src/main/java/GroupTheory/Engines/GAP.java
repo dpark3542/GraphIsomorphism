@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class GAP implements GroupTheoryEngine {
@@ -81,11 +83,13 @@ public class GAP implements GroupTheoryEngine {
     public List<Domain> getOrbits(Group g, Domain d) {
         write("OrbitsDomain(" + g.toString() + ", " + d.toString() + ", OnSets);");
 
-        // TODO:
-//        Node tree = NestedParser.parse(read(), "[]");
+        List<Domain> orbits = new ArrayList<>();
+        Node tree = NestedParser.parse(read());
+        for (Node domain : tree) {
+            orbits.add(NestedParser.parseDomain(domain));
+        }
 
-        System.out.println(read());
-        return null;
+        return orbits;
     }
 
     @Override

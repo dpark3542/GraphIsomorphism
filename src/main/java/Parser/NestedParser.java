@@ -1,14 +1,17 @@
 package Parser;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import GroupTheory.Structs.Domain;
+import GroupTheory.Structs.ExplicitDomain;
+import GroupTheory.Structs.Tuple;
+
+import java.util.*;
 
 public final class NestedParser {
-    public static Node parse(String s, String delimiters) {
-        if (delimiters.length() != 2) {
-            throw new IllegalArgumentException();
-        }
-        char left = delimiters.charAt(0), right = delimiters.charAt(1);
+    public static Node parse(String s) {
+        return parse(s, '[', ']', ',');
+    }
+
+    public static Node parse(String s, char left, char right, char split) {
         Node root = new Node();
         Deque<Node> st = new ArrayDeque<>();
         st.addLast(root);
@@ -17,22 +20,45 @@ public final class NestedParser {
             Node node = st.peekLast();
             char c = s.charAt(i);
             if (c == left) {
-                Node child = new Node();
-                node.addChild(child);
-                st.addLast(child);
+                st.addLast(new Node());
                 value = new StringBuilder();
             }
             else if (c == right) {
                 if (node.isLeaf()) {
-                    node.setValue(value.toString());
+                    node.setValue(Long.parseLong(value.toString().trim()));
                     value = new StringBuilder();
                 }
                 st.pollLast();
+                st.peekLast().addChild(node);
+            }
+            else if (c == split) {
+                if (node.isLeaf()) {
+                    node.setValue(Long.parseLong(value.toString().trim()));
+                    value = new StringBuilder();
+                }
+                st.pollLast();
+                st.peekLast().addChild(node);
+                st.addLast(new Node());
             }
             else {
                 value.append(c);
             }
         }
         return root;
+    }
+
+    public static Domain parseDomain(Node node) {
+        Set<Tuple> s = new HashSet<>();
+
+        for (Node child : node) {
+            List<Integer> tuple = new ArrayList<>();
+            for (Node x : child) {
+                tuple.add((int) x.getValue());
+            }
+            s.add(new Tuple(tuple));
+        }
+
+//        return new ExplicitDomain(s);
+        return null;
     }
 }

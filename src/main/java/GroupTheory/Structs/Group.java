@@ -1,6 +1,7 @@
 package GroupTheory.Structs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Group {
@@ -14,7 +15,7 @@ public class Group {
 
     public Group(Permutation... generators) {
         n = generators.length;
-        this.generators = generators;
+        this.generators = Arrays.copyOf(generators, n);
     }
 
     @Override

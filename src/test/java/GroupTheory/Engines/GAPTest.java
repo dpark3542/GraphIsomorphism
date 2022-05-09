@@ -1,9 +1,6 @@
 package GroupTheory.Engines;
 
-import GroupTheory.Structs.Cycle;
-import GroupTheory.Structs.Group;
-import GroupTheory.Structs.ImplicitDomain;
-import GroupTheory.Structs.Permutation;
+import GroupTheory.Structs.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -37,7 +34,9 @@ class GAPTest {
     void getOrbits() {
         GroupTheoryEngine gap = new GAP(location, true);
 
-        gap.getOrbits(K4, new ImplicitDomain(4, 1));
+        for (Domain domain : gap.getOrbits(K4, new ImplicitDomain(4, 1))) {
+            System.out.println(domain);
+        }
 
         gap.close();
     }

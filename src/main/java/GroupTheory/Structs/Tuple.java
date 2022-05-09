@@ -3,10 +3,10 @@ package GroupTheory.Structs;
 import java.util.*;
 
 /**
- * A tuple is a set of integers.
+ * A tuple is a set of positive integers.
  * Implemented with a sorted array since the tuple is unlikely to be large enough to justify using a HashSet.
  */
-public class Tuple {
+public class Tuple implements Iterable<Integer> {
     private final int n;
     private final int[] tuple;
 
@@ -24,13 +24,39 @@ public class Tuple {
 
     public Tuple(int... tuple) {
         n = tuple.length;
-        this.tuple = tuple;
+        this.tuple = Arrays.copyOf(tuple, n);
         Arrays.sort(this.tuple);
         check();
     }
 
     private void check() {
-        // TODO: check for duplicates since we are not using HashSet anymore
+        if (tuple[0] < 1) {
+            throw new RuntimeException();
+        }
+        for (int i = 0; i < n - 1; i++) {
+            if (tuple[i] == tuple[i + 1]) {
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    public static Tuple fromIndicator(boolean[] indicator) {
+        int n = indicator.length;
+        List<Integer> a = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (indicator[i]) {
+                a.add(i + 1);
+            }
+        }
+        return new Tuple(a);
+    }
+
+    public int size() {
+        return n;
+    }
+
+    public int getMax() {
+        return tuple[n - 1];
     }
 
     @Override
@@ -51,9 +77,6 @@ public class Tuple {
         if (obj == this) {
             return true;
         }
-//        else if (n == 1 && (obj instanceof Integer)) {
-//            return tuple.contains(obj);
-//        }
         else if (!(obj instanceof Tuple t)) {
             return false;
         }
@@ -68,6 +91,27 @@ public class Tuple {
             }
             return true;
         }
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new Iterator<>() {
+            private int i = 0;
+            private final int n = Tuple.this.n;
+            private final int[] tuple = Tuple.this.tuple;
+
+            @Override
+            public boolean hasNext() {
+                return i < n;
+            }
+
+            @Override
+            public Integer next() {
+                int v = tuple[i];
+                i++;
+                return v;
+            }
+        };
     }
 
     @Override

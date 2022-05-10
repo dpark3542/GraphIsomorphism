@@ -40,17 +40,6 @@ public class Tuple implements Iterable<Integer> {
         }
     }
 
-    public static Tuple fromIndicator(boolean[] indicator) {
-        int n = indicator.length;
-        List<Integer> a = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            if (indicator[i]) {
-                a.add(i + 1);
-            }
-        }
-        return new Tuple(a);
-    }
-
     public int size() {
         return n;
     }

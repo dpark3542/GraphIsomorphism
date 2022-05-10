@@ -1,16 +1,19 @@
 package GroupTheory.Structs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-public class Permutation {
+public class Permutation implements Iterable<Cycle> {
     private final int n;
     private final Cycle[] cycles;
 
-    public Permutation(List<Cycle> cycles) {
+    public Permutation(Collection<Cycle> cycles) {
         n = cycles.size();
-        this.cycles = (Cycle[]) cycles.toArray();
+        this.cycles = new Cycle[n];
+        int i = 0;
+        for (Cycle cycle : cycles) {
+            this.cycles[i] = cycle;
+            i++;
+        }
         check();
     }
 
@@ -21,7 +24,36 @@ public class Permutation {
     }
 
     private void check() {
-        // TODO: check disjointness
+        Set<Integer> s = new HashSet<>();
+        for (Cycle cycle : cycles) {
+            for (int x : cycle) {
+                if (s.contains(x)) {
+                    throw new RuntimeException();
+                }
+                s.add(x);
+            }
+        }
+    }
+
+    @Override
+    public Iterator<Cycle> iterator() {
+        return new Iterator<>() {
+            private int i = 0;
+            private final int n = Permutation.this.n;
+            private final Cycle[] cycles = Permutation.this.cycles;
+
+            @Override
+            public boolean hasNext() {
+                return i < n;
+            }
+
+            @Override
+            public Cycle next() {
+                Cycle cycle = cycles[i];
+                i++;
+                return cycle;
+            }
+        };
     }
 
     @Override

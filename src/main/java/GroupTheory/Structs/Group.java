@@ -2,9 +2,10 @@ package GroupTheory.Structs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
-public class Group {
+public class Group implements Iterable<Permutation> {
     private final int n;
     private final Permutation[] generators;
 
@@ -16,6 +17,27 @@ public class Group {
     public Group(Permutation... generators) {
         n = generators.length;
         this.generators = Arrays.copyOf(generators, n);
+    }
+
+    @Override
+    public Iterator<Permutation> iterator() {
+        return new Iterator<>() {
+            private int i = 0;
+            private final int n = Group.this.n;
+            private final Permutation[] generators = Group.this.generators;
+
+            @Override
+            public boolean hasNext() {
+                return i < n;
+            }
+
+            @Override
+            public Permutation next() {
+                Permutation generator = generators[i];
+                i++;
+                return generator;
+            }
+        };
     }
 
     @Override

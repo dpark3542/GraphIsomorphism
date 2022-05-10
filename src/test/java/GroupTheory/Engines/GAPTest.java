@@ -34,9 +34,7 @@ class GAPTest {
     void getOrbits() {
         GroupTheoryEngine gap = new GAP(location, true);
 
-        for (Domain domain : gap.getOrbits(K4, new ImplicitDomain(4, 1))) {
-            System.out.println(domain);
-        }
+        gap.getOrbits(K4, new ImplicitDomain(4, 2));
 
         gap.close();
     }

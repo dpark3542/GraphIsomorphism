@@ -50,8 +50,8 @@ public record ImplicitDomain(int n, int k) implements Domain {
     }
 
     @Override
-    public boolean inDomain(Tuple t) {
-        return t.size() == k && t.getMax() <= n;
+    public boolean inDomain(Tuple tuple) {
+        return tuple.size() == k && tuple.getMax() <= n;
     }
 
     @Override

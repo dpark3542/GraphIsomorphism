@@ -1,19 +1,18 @@
 package GroupTheory.Structs;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-public class Cycle {
+public class Cycle implements Iterable<Integer> {
     private final int n;
     private final int[] cycle;
 
-    public Cycle(List<Integer> cycle) {
+    public Cycle(Collection<Integer> cycle) {
         n = cycle.size();
         this.cycle = new int[n];
-        for (int i = 0; i < n; i++) {
-            this.cycle[i] = cycle.get(i);
+        int i = 0;
+        for (int x : cycle) {
+            this.cycle[i] = x;
+            i++;
         }
         check();
     }
@@ -32,6 +31,27 @@ public class Cycle {
             }
             s.add(x);
         }
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return new Iterator<>() {
+            private int i = 0;
+            private final int n = Cycle.this.n;
+            private final int[] cycle = Cycle.this.cycle;
+
+            @Override
+            public boolean hasNext() {
+                return i < n;
+            }
+
+            @Override
+            public Integer next() {
+                int x = cycle[i];
+                i++;
+                return x;
+            }
+        };
     }
 
     @Override

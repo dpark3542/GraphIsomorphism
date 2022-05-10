@@ -48,17 +48,16 @@ public final class NestedParser {
     }
 
     public static Domain parseDomain(Node node) {
-        Set<Tuple> s = new HashSet<>();
+        List<Tuple> a = new ArrayList<>();
 
         for (Node child : node) {
             List<Integer> tuple = new ArrayList<>();
             for (Node x : child) {
                 tuple.add((int) x.getValue());
             }
-            s.add(new Tuple(tuple));
+            a.add(new Tuple(tuple));
         }
 
-//        return new ExplicitDomain(s);
-        return null;
+        return new ExplicitDomain(a);
     }
 }

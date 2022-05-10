@@ -45,7 +45,7 @@ public class Node implements Iterable<Node> {
             int n = children.size();
             for (int i = 0; i < n - 1; i++) {
                 sb.append(children.get(i).toString());
-                sb.append(", ");
+                sb.append(',');
             }
             sb.append(children.get(n - 1));
             sb.append(']');

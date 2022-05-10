@@ -17,12 +17,4 @@ class NestedParserTest {
         Node node = NestedParser.parse(K4Orbit);
         assertEquals(compress(K4Orbit), node.toString());
     }
-
-    @Test
-    void parseDomain() {
-        Node node = NestedParser.parse(K4Orbit);
-        for (Node child : node) {
-            Domain domain = NestedParser.parseDomain(child);
-        }
-    }
 }

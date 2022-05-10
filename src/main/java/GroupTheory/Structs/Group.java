@@ -1,17 +1,19 @@
 package GroupTheory.Structs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Group implements Iterable<Permutation> {
     private final int n;
     private final Permutation[] generators;
 
-    public Group(List<Permutation> generators) {
+    public Group(Collection<Permutation> generators) {
         n = generators.size();
-        this.generators = (Permutation[]) generators.toArray();
+        this.generators = new Permutation[n];
+        int i = 0;
+        for (Permutation generator : generators) {
+            this.generators[i] = generator;
+            i++;
+        }
     }
 
     public Group(Permutation... generators) {

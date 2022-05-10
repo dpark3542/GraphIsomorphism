@@ -41,9 +41,19 @@ class GAPTest {
 
     @Test
     void getPointwiseStabilizer() {
+        GroupTheoryEngine gap = new GAP(location, true);
+
+        Group stabilizers = gap.getPointwiseStabilizer(K4, new ExplicitDomain(new Tuple(1), new Tuple(2)));
+        assertEquals(stabilizers.toString(), "Group((3,4))");
+
+        stabilizers = gap.getPointwiseStabilizer(K4, new ImplicitDomain(4, 2));
+        assertEquals(stabilizers.toString(), "Group()");
+
+        gap.close();
     }
 
     @Test
     void getMinimalBlockSystem() {
+        // TODO:
     }
 }

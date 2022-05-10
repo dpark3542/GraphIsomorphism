@@ -9,8 +9,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GAP implements GroupTheoryEngine {
     private final boolean log;
@@ -20,6 +21,8 @@ public class GAP implements GroupTheoryEngine {
 
     private static final String initialPrompt = " Try";
     private static final String outFormat = "SetPrintFormattingStatus(\"*stdout*\", false);;";
+
+    private static final Pattern generatorPattern = Pattern.compile("\\([()\\d,]+\\)"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
 
     public GAP(String location, boolean log) {
         try {
@@ -67,6 +70,20 @@ public class GAP implements GroupTheoryEngine {
         out.flush();
     }
 
+    private static Domain parseDomain(Node node) {
+        List<Tuple> a = new ArrayList<>();
+
+        for (Node child : node) {
+            List<Integer> tuple = new ArrayList<>();
+            for (Node x : child) {
+                tuple.add(x.getValue());
+            }
+            a.add(new Tuple(tuple));
+        }
+
+        return new ExplicitDomain(a);
+    }
+
     @Override
     public long getOrder(Group g) {
         write("Order(" + g.toString() + ");");
@@ -86,7 +103,7 @@ public class GAP implements GroupTheoryEngine {
         List<Domain> orbits = new ArrayList<>();
         Node tree = NestedParser.parse(read());
         for (Node domain : tree) {
-            orbits.add(NestedParser.parseDomain(domain));
+            orbits.add(parseDomain(domain));
         }
 
         return orbits;
@@ -94,9 +111,29 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public Group getPointwiseStabilizer(Group g, Domain d) {
-        return null;
+        write("Stabilizer(" + g.toString() + ", " + d.toString() + ", OnTuplesSets);");
+
+        List<Permutation> generators = new ArrayList<>();
+        String s = read();
+        Matcher generatorMatcher = generatorPattern.matcher(s);
+        while (generatorMatcher.find()) {
+            List<Cycle> cycles = new ArrayList<>();
+            Matcher cycleMatcher = cyclePattern.matcher(generatorMatcher.group());
+            while (cycleMatcher.find()) {
+                List<Integer> cycle = new ArrayList<>();
+                Matcher digitMatcher = digitPattern.matcher(cycleMatcher.group());
+                while (digitMatcher.find()) {
+                    cycle.add(Integer.parseInt(digitMatcher.group()));
+                }
+                cycles.add(new Cycle(cycle));
+            }
+            generators.add(new Permutation(cycles));
+        }
+
+        return new Group(generators);
     }
 
+    // TODO:
     @Override
     public Domain getMinimalBlockSystem(Group g, Domain d) {
         return null;

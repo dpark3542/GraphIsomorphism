@@ -12,6 +12,10 @@ public class ExplicitDomain implements Domain {
         this.domain = Collections.unmodifiableSet(s);
     }
 
+    public ExplicitDomain(Tuple... domain) {
+        this(List.of(domain));
+    }
+
     @Override
     public Iterator<Tuple> iterator() {
         return domain.iterator();

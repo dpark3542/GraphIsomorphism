@@ -9,6 +9,7 @@ class ImplicitDomainTest {
     @Test
     void iterator() {
         ImplicitDomain domain = new ImplicitDomain(4, 2);
+        // TODO:
         for (Tuple tuple : domain) {
             System.out.println(tuple);
         }

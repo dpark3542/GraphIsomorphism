@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Node implements Iterable<Node> {
-    private long value;
+    private int value;
     private final List<Node> children;
 
     Node() {
@@ -17,7 +17,7 @@ public class Node implements Iterable<Node> {
         return children.isEmpty();
     }
 
-    void setValue(long value) {
+    void setValue(int value) {
         this.value = value;
     }
 
@@ -25,7 +25,7 @@ public class Node implements Iterable<Node> {
         children.add(child);
     }
 
-    public long getValue() {
+    public int getValue() {
         return value;
     }
 

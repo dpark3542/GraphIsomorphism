@@ -1,10 +1,7 @@
 package Parser;
 
-import GroupTheory.Structs.Domain;
-import GroupTheory.Structs.ExplicitDomain;
-import GroupTheory.Structs.Tuple;
-
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public final class NestedParser {
     public static Node parse(String s) {
@@ -25,7 +22,7 @@ public final class NestedParser {
             }
             else if (c == right) {
                 if (node.isLeaf()) {
-                    node.setValue(Long.parseLong(value.toString().trim()));
+                    node.setValue(Integer.parseInt(value.toString().trim()));
                     value = new StringBuilder();
                 }
                 st.pollLast();
@@ -33,7 +30,7 @@ public final class NestedParser {
             }
             else if (c == split) {
                 if (node.isLeaf()) {
-                    node.setValue(Long.parseLong(value.toString().trim()));
+                    node.setValue(Integer.parseInt(value.toString().trim()));
                     value = new StringBuilder();
                 }
                 st.pollLast();
@@ -45,19 +42,5 @@ public final class NestedParser {
             }
         }
         return root;
-    }
-
-    public static Domain parseDomain(Node node) {
-        List<Tuple> a = new ArrayList<>();
-
-        for (Node child : node) {
-            List<Integer> tuple = new ArrayList<>();
-            for (Node x : child) {
-                tuple.add((int) x.getValue());
-            }
-            a.add(new Tuple(tuple));
-        }
-
-        return new ExplicitDomain(a);
     }
 }

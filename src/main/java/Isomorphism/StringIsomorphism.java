@@ -26,22 +26,14 @@ public final class StringIsomorphism {
         return iso != null;
     }
 
-    /**
-     * Permutes string.
-     * Important: does not invert permutation from Babai's notation.
-     *
-     * @param s
-     * @param p
-     * @return
-     */
-    private static FormalString act(FormalString s, Permutation p) {
-        int n = s.size();
-        int[] map = new int[n];
-        // TODO:
-        return null;
-    }
-
     private static Coset union(GroupTheoryEngine engine, Coset x, Coset y) {
+        if (x == null) {
+            return y;
+        }
+        if (y == null) {
+            return x;
+        }
+
         List<Permutation> generators = new ArrayList<>();
         x.group().iterator().forEachRemaining(generators::add);
 
@@ -59,8 +51,13 @@ public final class StringIsomorphism {
         }
 
         if (!c.element().isIdentity()) {
-            Coset tmp = luks(engine, new Coset(c.group(), new Permutation()), d, s, act(t, c.element()));
-            return new Coset(tmp.group(), engine.multiply(tmp.element(), c.element()));
+            Coset tmp = luks(engine, new Coset(c.group(), new Permutation()), d, s, engine.permute(t, c.element()));
+            if (tmp == null) {
+                return null;
+            }
+            else {
+                return new Coset(tmp.group(), engine.multiply(tmp.element(), c.element()));
+            }
         }
 
         Group g = c.group();
@@ -77,7 +74,11 @@ public final class StringIsomorphism {
         if (!engine.isTransitive(g, d)) {
             List<Domain> orbits = engine.getOrbits(g, d);
             for (Domain orbit : orbits) {
-                g = luks(engine, new Coset(g, new Permutation()), orbit, s, t).group();
+                Coset tmp = luks(engine, new Coset(g, new Permutation()), orbit, s, t);
+                if (tmp == null) {
+                    return null;
+                }
+                g = tmp.group();
             }
             return new Coset(g, new Permutation());
         }

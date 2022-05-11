@@ -56,8 +56,14 @@ public record ImplicitDomain(int n, int k) implements Domain {
 
     @Override
     public int size() {
-        // TODO:
-        return 0;
+        int res = 1;
+        for (int i = n - k + 1; i <= n; i++) {
+            res *= i;
+        }
+        for (int i = 2; i <= k; i++) {
+            res /= i;
+        }
+        return res;
     }
 
     @Override

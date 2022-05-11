@@ -20,9 +20,10 @@ public class GAP implements GroupTheoryEngine {
     private final PrintWriter out;
 
     private static final String initialPrompt = " Try";
+    private static final String prompt = "gap> ";
     private static final String outFormat = "SetPrintFormattingStatus(\"*stdout*\", false);;";
 
-    private static final Pattern permutationPattern = Pattern.compile("\\([()\\d,]+\\)"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
+    private static final Pattern permutationPattern = Pattern.compile("(\\([()\\d,]+\\)|\\(\\))"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
 
     public GAP(String location, boolean log) {
         if (!location.endsWith("/")) {
@@ -66,7 +67,7 @@ public class GAP implements GroupTheoryEngine {
     private String read() {
         try {
             String line = in.readLine();
-            while (line.startsWith("gap> ")) {
+            while (line.startsWith(prompt)) {
                 line = line.substring(5);
             }
             // TODO: catch error
@@ -84,6 +85,19 @@ public class GAP implements GroupTheoryEngine {
         return Integer.parseInt(read());
     }
 
+    private List<Integer> parseDigits(String u) {
+        List<Integer> a = new ArrayList<>();
+        Matcher digitMatcher = digitPattern.matcher(u);
+        while (digitMatcher.find()) {
+            a.add(Integer.parseInt(digitMatcher.group()));
+        }
+        return a;
+    }
+
+    private FormalString readFormalString() {
+        return new FormalString(parseDigits(read()));
+    }
+
     private Permutation parsePermutation(String t) {
         if (t.equals("()")) {
             return new Permutation();
@@ -92,12 +106,7 @@ public class GAP implements GroupTheoryEngine {
             List<Cycle> cycles = new ArrayList<>();
             Matcher cycleMatcher = cyclePattern.matcher(t);
             while (cycleMatcher.find()) {
-                List<Integer> cycle = new ArrayList<>();
-                Matcher digitMatcher = digitPattern.matcher(cycleMatcher.group());
-                while (digitMatcher.find()) {
-                    cycle.add(Integer.parseInt(digitMatcher.group()));
-                }
-                cycles.add(new Cycle(cycle));
+                cycles.add(new Cycle(parseDigits(cycleMatcher.group())));
             }
             return new Permutation(cycles);
         }
@@ -126,14 +135,20 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public Permutation multiply(Permutation p, Permutation q) {
-        write(p.toString() + '*' + q.toString());
+        write(p.toString() + '*' + q.toString() + ';');
         return parsePermutation(read());
     }
 
     @Override
     public Permutation invert(Permutation p) {
-        write(p.toString() + "^-1");
+        write(p.toString() + "^-1" + ';');
         return parsePermutation(read());
+    }
+
+    @Override
+    public FormalString permute(FormalString s, Permutation p) {
+        write("Permuted(" + s.toString() + ", " + p.toString() + ");");
+        return readFormalString();
     }
 
     @Override
@@ -202,14 +217,18 @@ public class GAP implements GroupTheoryEngine {
             throw new RuntimeException();
         }
 
-        write("MaximalBlocks(" + g.toString() + ", " + d.toString() + ", OnSets);");
+        write("Blocks(" + g.toString() + ", " + d.toString() + ", OnSets);");
 
         Node tree = NestedParser.parse(read());
-        for (Node child : tree) {
-            g = getSetwiseStabilizer(g, parseDomain(child));
+        if (tree.numChildren() == 1) {
+            return new Group();
         }
-
-        return g;
+        else {
+            for (Node child : tree) {
+                g = getSetwiseStabilizer(g, parseDomain(child));
+            }
+            return g;
+        }
     }
 
     public boolean isSubgroup(Group g, Group h) {

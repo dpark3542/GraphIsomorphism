@@ -6,7 +6,7 @@ public class Cycle implements Iterable<Integer> {
     private final int n;
     private final int[] cycle;
 
-    public Cycle(Collection<Integer> cycle) {
+    public Cycle(List<Integer> cycle) {
         n = cycle.size();
         this.cycle = new int[n];
         int i = 0;

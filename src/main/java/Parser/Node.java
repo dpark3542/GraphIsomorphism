@@ -29,6 +29,10 @@ public class Node implements Iterable<Node> {
         return value;
     }
 
+    public int numChildren() {
+        return children.size();
+    }
+
     @Override
     public Iterator<Node> iterator() {
         return children.iterator();

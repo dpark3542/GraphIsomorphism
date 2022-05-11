@@ -1,6 +1,7 @@
 package GroupTheory.Engines;
 
 import GroupTheory.Structs.Domain;
+import GroupTheory.Structs.FormalString;
 import GroupTheory.Structs.Group;
 import GroupTheory.Structs.Permutation;
 
@@ -15,6 +16,11 @@ public class Native implements GroupTheoryEngine {
 
     @Override
     public Permutation invert(Permutation p) {
+        return null;
+    }
+
+    @Override
+    public FormalString permute(FormalString s, Permutation p) {
         return null;
     }
 

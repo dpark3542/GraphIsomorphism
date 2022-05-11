@@ -8,10 +8,16 @@ class ImplicitDomainTest {
 
     @Test
     void iterator() {
-        ImplicitDomain domain = new ImplicitDomain(4, 2);
-        // TODO:
-        for (Tuple tuple : domain) {
-            System.out.println(tuple);
-        }
+    }
+
+    @Test
+    void inDomain() {
+    }
+
+    @Test
+    void size() {
+        assertEquals(4, new ImplicitDomain(4, 1).size());
+        assertEquals(6, new ImplicitDomain(4, 2).size());
+        assertEquals(1, new ImplicitDomain(4, 4).size());
     }
 }

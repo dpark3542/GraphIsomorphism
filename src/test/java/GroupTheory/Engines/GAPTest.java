@@ -64,10 +64,10 @@ class GAPTest {
         GroupTheoryEngine gap = new GAP(location, true);
 
         Group stabilizers = gap.getPointwiseStabilizer(K4, new ExplicitDomain(new Tuple(1), new Tuple(2)));
-        assertEquals(stabilizers.toString(), new Group(new Permutation(new Cycle(3, 4))).toString());
+        assertEquals(new Group(new Permutation(new Cycle(3, 4))).toString(), stabilizers.toString());
 
         stabilizers = gap.getPointwiseStabilizer(K4, new ImplicitDomain(4, 2));
-        assertEquals(stabilizers.toString(), new Group().toString());
+        assertEquals(new Group().toString(), stabilizers.toString());
 
         gap.close();
     }

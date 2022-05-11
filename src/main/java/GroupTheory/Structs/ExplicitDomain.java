@@ -26,6 +26,11 @@ public class ExplicitDomain implements Domain {
     }
 
     @Override
+    public int size() {
+        return n;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append('[');

@@ -44,8 +44,8 @@ public class Tuple implements Iterable<Integer>, Comparable<Tuple> {
         return n;
     }
 
-    public int getMax() {
-        return tuple[n - 1];
+    public int get(int i) {
+        return tuple[i];
     }
 
     @Override

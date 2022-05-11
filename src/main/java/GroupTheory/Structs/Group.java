@@ -21,6 +21,10 @@ public class Group implements Iterable<Permutation> {
         this.generators = Arrays.copyOf(generators, n);
     }
 
+    public boolean isTrivial() {
+        return n == 0;
+    }
+
     @Override
     public Iterator<Permutation> iterator() {
         return new Iterator<>() {
@@ -44,14 +48,19 @@ public class Group implements Iterable<Permutation> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Group(");
-        for (int i = 0; i < n - 1; i++) {
-            sb.append(generators[i].toString());
-            sb.append(',');
+        if (isTrivial()) {
+            return "Group(())";
         }
-        sb.append(generators[n - 1]);
-        sb.append(')');
-        return sb.toString();
+        else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Group(");
+            for (int i = 0; i < n - 1; i++) {
+                sb.append(generators[i].toString());
+                sb.append(',');
+            }
+            sb.append(generators[n - 1]);
+            sb.append(')');
+            return sb.toString();
+        }
     }
 }

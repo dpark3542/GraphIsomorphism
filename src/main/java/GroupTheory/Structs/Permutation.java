@@ -35,6 +35,15 @@ public class Permutation implements Iterable<Cycle> {
         }
     }
 
+    public boolean isIdentity() {
+        return n == 0;
+    }
+
+    // TODO: refactor
+    public int[] image(int max) {
+        return null;
+    }
+
     @Override
     public Iterator<Cycle> iterator() {
         return new Iterator<>() {
@@ -58,10 +67,15 @@ public class Permutation implements Iterable<Cycle> {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (Cycle cycle : cycles) {
-            sb.append(cycle.toString());
+        if (isIdentity()) {
+            return "()";
         }
-        return sb.toString();
+        else {
+            StringBuilder sb = new StringBuilder();
+            for (Cycle cycle : cycles) {
+                sb.append(cycle.toString());
+            }
+            return sb.toString();
+        }
     }
 }

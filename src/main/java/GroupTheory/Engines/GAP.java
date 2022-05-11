@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +22,7 @@ public class GAP implements GroupTheoryEngine {
     private static final String initialPrompt = " Try";
     private static final String outFormat = "SetPrintFormattingStatus(\"*stdout*\", false);;";
 
-    private static final Pattern generatorPattern = Pattern.compile("\\([()\\d,]+\\)"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
+    private static final Pattern permutationPattern = Pattern.compile("\\([()\\d,]+\\)"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
 
     public GAP(String location, boolean log) {
         if (!location.endsWith("/")) {
@@ -56,6 +55,14 @@ public class GAP implements GroupTheoryEngine {
         this(System.getenv("GAP_HOME"), false);
     }
 
+    private void write(String s) {
+        if (log) {
+            System.out.println("GAP: " + s);
+        }
+        out.println(s);
+        out.flush();
+    }
+
     private String read() {
         try {
             String line = in.readLine();
@@ -69,16 +76,82 @@ public class GAP implements GroupTheoryEngine {
         }
     }
 
-    private void write(String s) {
-        if (log) {
-            System.out.println("GAP: " + s);
-        }
-        out.println(s);
-        out.flush();
+    private boolean readBoolean() {
+        return Boolean.parseBoolean(read());
     }
 
-    private boolean readBoolean() {
-        return read().equals("true");
+    private int readInt() {
+        return Integer.parseInt(read());
+    }
+
+    private Permutation parsePermutation(String t) {
+        if (t.equals("()")) {
+            return new Permutation();
+        }
+        else {
+            List<Cycle> cycles = new ArrayList<>();
+            Matcher cycleMatcher = cyclePattern.matcher(t);
+            while (cycleMatcher.find()) {
+                List<Integer> cycle = new ArrayList<>();
+                Matcher digitMatcher = digitPattern.matcher(cycleMatcher.group());
+                while (digitMatcher.find()) {
+                    cycle.add(Integer.parseInt(digitMatcher.group()));
+                }
+                cycles.add(new Cycle(cycle));
+            }
+            return new Permutation(cycles);
+        }
+    }
+
+    private List<Permutation> parsePermutations(String s) {
+        List<Permutation> permutations = new ArrayList<>();
+        Matcher permutationMatcher = permutationPattern.matcher(s);
+        while (permutationMatcher.find()) {
+            permutations.add(parsePermutation(permutationMatcher.group()));
+        }
+
+        return permutations;
+    }
+
+    private Group readGroup() {
+        String s = read();
+        if (s.equals("Group(())")) {
+            return new Group();
+        }
+        // Group([ perm, ..., perm ])
+        else {
+            return new Group(parsePermutations(s));
+        }
+    }
+
+    @Override
+    public Permutation multiply(Permutation p, Permutation q) {
+        write(p.toString() + '*' + q.toString());
+        return parsePermutation(read());
+    }
+
+    @Override
+    public Permutation invert(Permutation p) {
+        write(p.toString() + "^-1");
+        return parsePermutation(read());
+    }
+
+    @Override
+    public int getOrder(Group g) {
+        write("Order(" + g.toString() + ");");
+        return readInt();
+    }
+
+    @Override
+    public boolean isMember(Permutation p, Group g) {
+        write(p.toString() + " in " + g.toString() + ';');
+        return readBoolean();
+    }
+
+    @Override
+    public boolean isTransitive(Group g, Domain d) {
+        write("IsTransitive(" + g.toString() + ", " + d.toString() + ", OnSets);");
+        return readBoolean();
     }
 
     private static Domain parseDomain(Node node) {
@@ -93,24 +166,6 @@ public class GAP implements GroupTheoryEngine {
         }
 
         return new ExplicitDomain(a);
-    }
-
-    @Override
-    public long getOrder(Group g) {
-        write("Order(" + g.toString() + ");");
-        return Long.parseLong(read());
-    }
-
-    @Override
-    public boolean isMember(Permutation p, Group g) {
-        write(p.toString() + " in " + g.toString() + ';');
-        return Boolean.parseBoolean(read());
-    }
-
-    @Override
-    public boolean isTransitive(Group g, Domain d) {
-        write("IsTransitive(" + g.toString() + ", " + d.toString() + ", OnSets);");
-        return readBoolean();
     }
 
     @Override
@@ -129,24 +184,7 @@ public class GAP implements GroupTheoryEngine {
     private Group getStabilizer(Group g, Domain d, String action) {
         write("Stabilizer(" + g.toString() + ", " + d.toString() + ", " + action + ");");
 
-        List<Permutation> generators = new ArrayList<>();
-        String s = read();
-        Matcher generatorMatcher = generatorPattern.matcher(s);
-        while (generatorMatcher.find()) {
-            List<Cycle> cycles = new ArrayList<>();
-            Matcher cycleMatcher = cyclePattern.matcher(generatorMatcher.group());
-            while (cycleMatcher.find()) {
-                List<Integer> cycle = new ArrayList<>();
-                Matcher digitMatcher = digitPattern.matcher(cycleMatcher.group());
-                while (digitMatcher.find()) {
-                    cycle.add(Integer.parseInt(digitMatcher.group()));
-                }
-                cycles.add(new Cycle(cycle));
-            }
-            generators.add(new Permutation(cycles));
-        }
-
-        return new Group(generators);
+        return readGroup();
     }
 
     @Override
@@ -154,7 +192,7 @@ public class GAP implements GroupTheoryEngine {
         return getStabilizer(g, d, "OnTuplesSets");
     }
 
-    private Group getSetwiseStabilizer(Group g, Domain d) {
+    public Group getSetwiseStabilizer(Group g, Domain d) {
         return getStabilizer(g, d, "OnSetsSets");
     }
 
@@ -172,6 +210,22 @@ public class GAP implements GroupTheoryEngine {
         }
 
         return g;
+    }
+
+    public boolean isSubgroup(Group g, Group h) {
+        write("IsSubgroup(" + g.toString() + ", " + h.toString() + ");");
+        return readBoolean();
+    }
+
+    @Override
+    public List<Permutation> getTransversal(Group g, Group h) {
+        if (!isSubgroup(g, h)) {
+            throw new RuntimeException();
+        }
+
+        write("Elements(RightTransversal(" + g.toString() + ", " + h.toString() + "));");
+
+        return parsePermutations(read());
     }
 
     public void close() {

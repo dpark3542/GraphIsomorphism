@@ -9,7 +9,17 @@ import java.util.List;
 // TODO:
 public class Native implements GroupTheoryEngine {
     @Override
-    public long getOrder(Group g) {
+    public Permutation multiply(Permutation p, Permutation q) {
+        return null;
+    }
+
+    @Override
+    public Permutation invert(Permutation p) {
+        return null;
+    }
+
+    @Override
+    public int getOrder(Group g) {
         return 0;
     }
 
@@ -35,6 +45,11 @@ public class Native implements GroupTheoryEngine {
 
     @Override
     public Group getMinimalBlockSystemStabilizer(Group g, Domain d) {
+        return null;
+    }
+
+    @Override
+    public List<Permutation> getTransversal(Group g, Group h) {
         return null;
     }
 

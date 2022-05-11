@@ -24,6 +24,9 @@ public class Cycle implements Iterable<Integer> {
     }
 
     private void check() {
+        if (n <= 1) {
+            throw new RuntimeException();
+        }
         Set<Integer> s = new HashSet<>();
         for (int x : cycle) {
             if (s.contains(x)) {

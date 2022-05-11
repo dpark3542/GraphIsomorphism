@@ -35,20 +35,20 @@ public class AdjacencyMatrixGraph implements Graph {
     }
 
     @Override
-    public int getNumVertices() {
+    public int getSize() {
         return n;
     }
 
     @Override
     public boolean isAdjacent(int u, int v) {
-        return g[u][v];
+        return g[u - 1][v - 1];
     }
 
     @Override
     public List<Integer> getNeighbors(int v) {
         List<Integer> neighbors = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            if (g[i][v]) {
+            if (g[i][v - 1]) {
                 neighbors.add(i);
             }
         }

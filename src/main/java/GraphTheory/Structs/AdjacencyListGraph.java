@@ -34,17 +34,17 @@ public class AdjacencyListGraph implements Graph {
     }
 
     @Override
-    public int getNumVertices() {
+    public int getSize() {
         return n;
     }
 
     @Override
     public boolean isAdjacent(int u, int v) {
-        return g.get(u).contains(v);
+        return g.get(u - 1).contains(v - 1);
     }
 
     @Override
     public List<Integer> getNeighbors(int v) {
-        return Collections.unmodifiableList(g.get(v));
+        return Collections.unmodifiableList(g.get(v - 1));
     }
 }

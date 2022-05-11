@@ -7,7 +7,7 @@ import java.util.Deque;
 
 public final class GraphConnectivity {
     public static boolean isConnected(Graph g) {
-        int n = g.getNumVertices();
+        int n = g.getSize();
         boolean[] mkd = new boolean[n];
         Deque<Integer> st = new ArrayDeque<>();
         st.addLast(0);

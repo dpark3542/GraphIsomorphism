@@ -3,7 +3,7 @@ package GraphTheory.Structs;
 import java.util.List;
 
 public interface Graph {
-    public int getNumVertices();
+    public int getSize();
     public boolean isAdjacent(int u, int v);
 
     /**

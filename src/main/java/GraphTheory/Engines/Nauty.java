@@ -30,7 +30,7 @@ public class Nauty {
         BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
         PrintWriter out = new PrintWriter(process.getOutputStream());
 
-        int n = g.getNumVertices();
+        int n = g.getSize();
         out.println("n=" + n);
         out.flush();
         out.println('m');
@@ -61,8 +61,8 @@ public class Nauty {
     }
 
     public boolean isIsomorphic(Graph g, Graph h) throws IOException {
-        int n = g.getNumVertices();
-        if (h.getNumVertices() != n) {
+        int n = g.getSize();
+        if (h.getSize() != n) {
             return false;
         }
 

@@ -19,6 +19,10 @@ public class Nauty {
         }
     }
 
+    public Nauty() {
+        this(System.getenv("NAUTY_HOME"));
+    }
+
     private String amtogGraph(Graph g) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(location + "/amtog");

@@ -4,12 +4,11 @@ import java.util.*;
 
 public class ExplicitDomain implements Domain {
     private final int n;
-    private final Set<Tuple> domain;
+    private final SortedSet<Tuple> domain;
 
     public ExplicitDomain(Collection<Tuple> domain) {
         this.n = domain.size();
-        Set<Tuple> s = new HashSet<>(domain);
-        this.domain = Collections.unmodifiableSet(s);
+        this.domain = new TreeSet<>(domain);
     }
 
     public ExplicitDomain(Tuple... domain) {

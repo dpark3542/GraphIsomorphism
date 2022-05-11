@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,8 +26,13 @@ public class GAP implements GroupTheoryEngine {
     private static final Pattern generatorPattern = Pattern.compile("\\([()\\d,]+\\)"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
 
     public GAP(String location, boolean log) {
+        if (!location.endsWith("/")) {
+            location += '/';
+        }
+        location += "gap";
+        this.log = log;
+
         try {
-            this.log = log;
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(location);
             process = processBuilder.start();
@@ -46,8 +52,8 @@ public class GAP implements GroupTheoryEngine {
         }
     }
 
-    public GAP(String location) {
-        this(location, false);
+    public GAP() {
+        this(System.getenv("GAP_HOME"), false);
     }
 
     private String read() {
@@ -56,6 +62,7 @@ public class GAP implements GroupTheoryEngine {
             while (line.startsWith("gap> ")) {
                 line = line.substring(5);
             }
+            // TODO: catch error
             return line;
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -68,6 +75,10 @@ public class GAP implements GroupTheoryEngine {
         }
         out.println(s);
         out.flush();
+    }
+
+    private boolean readBoolean() {
+        return read().equals("true");
     }
 
     private static Domain parseDomain(Node node) {
@@ -97,21 +108,26 @@ public class GAP implements GroupTheoryEngine {
     }
 
     @Override
+    public boolean isTransitive(Group g, Domain d) {
+        write("IsTransitive(" + g.toString() + ", " + d.toString() + ", OnSets);");
+        return readBoolean();
+    }
+
+    @Override
     public List<Domain> getOrbits(Group g, Domain d) {
         write("OrbitsDomain(" + g.toString() + ", " + d.toString() + ", OnSets);");
 
         List<Domain> orbits = new ArrayList<>();
         Node tree = NestedParser.parse(read());
-        for (Node domain : tree) {
-            orbits.add(parseDomain(domain));
+        for (Node child : tree) {
+            orbits.add(parseDomain(child));
         }
 
         return orbits;
     }
 
-    @Override
-    public Group getPointwiseStabilizer(Group g, Domain d) {
-        write("Stabilizer(" + g.toString() + ", " + d.toString() + ", OnTuplesSets);");
+    private Group getStabilizer(Group g, Domain d, String action) {
+        write("Stabilizer(" + g.toString() + ", " + d.toString() + ", " + action + ");");
 
         List<Permutation> generators = new ArrayList<>();
         String s = read();
@@ -133,10 +149,29 @@ public class GAP implements GroupTheoryEngine {
         return new Group(generators);
     }
 
-    // TODO:
     @Override
-    public Domain getMinimalBlockSystem(Group g, Domain d) {
-        return null;
+    public Group getPointwiseStabilizer(Group g, Domain d) {
+        return getStabilizer(g, d, "OnTuplesSets");
+    }
+
+    private Group getSetwiseStabilizer(Group g, Domain d) {
+        return getStabilizer(g, d, "OnSetsSets");
+    }
+
+    @Override
+    public Group getMinimalBlockSystemStabilizer(Group g, Domain d) {
+        if (!isTransitive(g, d)) {
+            throw new RuntimeException();
+        }
+
+        write("MaximalBlocks(" + g.toString() + ", " + d.toString() + ", OnSets);");
+
+        Node tree = NestedParser.parse(read());
+        for (Node child : tree) {
+            g = getSetwiseStabilizer(g, parseDomain(child));
+        }
+
+        return g;
     }
 
     public void close() {

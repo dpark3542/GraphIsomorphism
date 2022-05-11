@@ -4,12 +4,24 @@ import GroupTheory.Structs.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GAPTest {
-    private String location = "/home/dpark/gap-4.11.1/gap";
-    private Group K4 = new Group(new Permutation(new Cycle(1, 2)), new Permutation(new Cycle(3, 4)));
+    private static final String location = System.getenv("GAP_HOME");
+    private static final Group K4 = new Group(new Permutation(new Cycle(1, 2)), new Permutation(new Cycle(3, 4)));
+    private static final Group D8 = new Group(new Permutation(new Cycle(1, 2), new Cycle(3, 4)), new Permutation(new Cycle(2, 4)));
+    private static final ExplicitDomain edges;
+
+    static {
+        List<Tuple> tuples = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            tuples.add(new Tuple(i, (i % 4) + 1));
+        }
+        edges = new ExplicitDomain(tuples);
+    }
 
     @Test
     void getOrder() {
@@ -31,12 +43,20 @@ class GAPTest {
     }
 
     @Test
-    void getOrbits() {
+    void isTransitive() {
         GroupTheoryEngine gap = new GAP(location, true);
 
-        gap.getOrbits(K4, new ImplicitDomain(4, 2));
+        assertFalse(gap.isTransitive(K4, new ImplicitDomain(4, 1)));
+        assertTrue(gap.isTransitive(D8, new ImplicitDomain(4, 1)));
+        assertFalse(gap.isTransitive(D8, new ImplicitDomain(4, 2)));
+        assertTrue(gap.isTransitive(D8, edges));
 
         gap.close();
+    }
+
+    @Test
+    void getOrbits() {
+        // TODO:
     }
 
     @Test
@@ -53,7 +73,12 @@ class GAPTest {
     }
 
     @Test
-    void getMinimalBlockSystem() {
+    void getMinimalBlockSystemStabilizer() {
+        GroupTheoryEngine gap = new GAP(location, true);
+
         // TODO:
+        gap.getMinimalBlockSystemStabilizer(D8, edges);
+
+        gap.close();
     }
 }

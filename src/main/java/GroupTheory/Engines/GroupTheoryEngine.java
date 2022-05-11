@@ -9,8 +9,9 @@ import java.util.List;
 public interface GroupTheoryEngine {
     long getOrder(Group g);
     boolean isMember(Permutation p, Group g);
+    boolean isTransitive(Group g, Domain d);
     List<Domain> getOrbits(Group g, Domain d);
     Group getPointwiseStabilizer(Group g, Domain d);
-    Domain getMinimalBlockSystem(Group g, Domain d);
+    Group getMinimalBlockSystemStabilizer(Group g, Domain d);
     void close();
 }

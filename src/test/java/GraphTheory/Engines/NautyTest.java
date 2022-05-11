@@ -10,11 +10,9 @@ import static GraphTheory.Utilities.GraphGenerator.cycleGraph;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NautyTest {
-    private String location = "/home/dpark/nauty27r3";
-
     @Test
     void isIsomorphic() throws IOException {
-        Nauty nauty = new Nauty(location);
+        Nauty nauty = new Nauty();
         assertTrue(nauty.isIsomorphic(completeGraph(3), completeGraph(3)));
         assertFalse(nauty.isIsomorphic(completeGraph(4), cycleGraph(4)));
     }

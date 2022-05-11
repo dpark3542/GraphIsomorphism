@@ -19,6 +19,11 @@ public class Native implements GroupTheoryEngine {
     }
 
     @Override
+    public boolean isTransitive(Group g, Domain d) {
+        return false;
+    }
+
+    @Override
     public List<Domain> getOrbits(Group g, Domain d) {
         return null;
     }
@@ -29,7 +34,7 @@ public class Native implements GroupTheoryEngine {
     }
 
     @Override
-    public Domain getMinimalBlockSystem(Group g, Domain d) {
+    public Group getMinimalBlockSystemStabilizer(Group g, Domain d) {
         return null;
     }
 

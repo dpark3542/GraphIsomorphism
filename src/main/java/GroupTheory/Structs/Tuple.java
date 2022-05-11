@@ -6,7 +6,7 @@ import java.util.*;
  * A tuple is a set of positive integers.
  * Implemented with a sorted array since the tuple is unlikely to be large enough to justify using a HashSet.
  */
-public class Tuple implements Iterable<Integer> {
+public class Tuple implements Iterable<Integer>, Comparable<Tuple> {
     private final int n;
     private final int[] tuple;
 
@@ -80,6 +80,27 @@ public class Tuple implements Iterable<Integer> {
             }
             return true;
         }
+    }
+
+    @Override
+    public int compareTo(Tuple t) {
+        if (n < t.n) {
+            return -1;
+        }
+        else if (n > t.n) {
+            return 1;
+        }
+        else {
+            for (int i = 0; i < n; i++) {
+                if (tuple[i] < t.tuple[i]) {
+                    return -1;
+                }
+                else if (tuple[i] > t.tuple[i]) {
+                    return 1;
+                }
+            }
+        }
+        return 0;
     }
 
     @Override

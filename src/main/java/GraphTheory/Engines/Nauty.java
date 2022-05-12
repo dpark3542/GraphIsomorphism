@@ -60,33 +60,37 @@ public class Nauty {
         return output;
     }
 
-    public boolean isIsomorphic(Graph g, Graph h) throws IOException {
+    public boolean isIsomorphic(Graph g, Graph h) {
         int n = g.getSize();
         if (h.getSize() != n) {
             return false;
         }
 
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(location + "/shortg");
-        Process process = processBuilder.start();
-        BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        PrintWriter out = new PrintWriter(process.getOutputStream());
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command(location + "/shortg");
+            Process process = processBuilder.start();
+            BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            PrintWriter out = new PrintWriter(process.getOutputStream());
 
-        out.println(amtogGraph(g));
-        out.flush();
-        out.println(amtogGraph(h));
-        out.flush();
-        out.close();
+            out.println(amtogGraph(g));
+            out.flush();
+            out.println(amtogGraph(h));
+            out.flush();
+            out.close();
 
-        String line = err.readLine();
-        while (line.startsWith(">")) {
-            if (line.startsWith(">Z") && line.endsWith("stdout")) {
-                int output = Integer.parseInt(line.split("\\s+")[1]);
-                return output == 1;
+            String line = err.readLine();
+            while (line.startsWith(">")) {
+                if (line.startsWith(">Z") && line.endsWith("stdout")) {
+                    int output = Integer.parseInt(line.split("\\s+")[1]);
+                    return output == 1;
+                }
+                line = err.readLine();
             }
-            line = err.readLine();
-        }
 
-        throw new RuntimeException();
+            throw new RuntimeException();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

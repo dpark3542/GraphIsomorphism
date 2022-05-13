@@ -60,9 +60,9 @@ public final class GraphParser {
         boolean[][] g = new boolean[n][n];
 
         for (int i = 0; i < n; i++) {
-            int u = in.nextInt(), v = in.nextInt();
-            g[u][v] = true;
-            g[v][u] = true;
+            for (int j = 0; j < n; j++) {
+                g[i][j] = (in.nextInt() == 1);
+            }
         }
 
         return new AdjacencyMatrixGraph(g);

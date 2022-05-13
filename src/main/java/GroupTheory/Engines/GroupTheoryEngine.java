@@ -1,13 +1,11 @@
 package GroupTheory.Engines;
 
-import GroupTheory.Structs.Domain;
-import GroupTheory.Structs.Group;
-import GroupTheory.Structs.Permutation;
-import GroupTheory.Structs.FormalString;
+import GroupTheory.Structs.*;
 
 import java.util.List;
 
 public interface GroupTheoryEngine {
+    Permutation listToPermutation(List<Integer> list);
     Permutation multiply(Permutation p, Permutation q);
     Permutation invert(Permutation p);
 
@@ -20,6 +18,17 @@ public interface GroupTheoryEngine {
      * @return permuted string
      */
     FormalString permute(FormalString s, Permutation p);
+
+    /**
+     * Gives image of each number in list under permutation.
+     * Important: different from permute.
+     *
+     * @param t list
+     * @param p permutation
+     * @return image
+     */
+    List<Integer> act(List<Integer> list, Permutation p);
+    List<Tuple> act(ImplicitDomain domain, Permutation p);
 
     int getOrder(Group g);
     boolean isMember(Permutation p, Group g);

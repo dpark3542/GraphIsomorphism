@@ -1,14 +1,16 @@
 package GroupTheory.Engines;
 
-import GroupTheory.Structs.Domain;
-import GroupTheory.Structs.FormalString;
-import GroupTheory.Structs.Group;
-import GroupTheory.Structs.Permutation;
+import GroupTheory.Structs.*;
 
 import java.util.List;
 
 // TODO:
 public class Native implements GroupTheoryEngine {
+    @Override
+    public Permutation listToPermutation(List<Integer> list) {
+        return null;
+    }
+
     @Override
     public Permutation multiply(Permutation p, Permutation q) {
         return null;
@@ -21,6 +23,16 @@ public class Native implements GroupTheoryEngine {
 
     @Override
     public FormalString permute(FormalString s, Permutation p) {
+        return null;
+    }
+
+    @Override
+    public List<Integer> act(List<Integer> list, Permutation p) {
+        return null;
+    }
+
+    @Override
+    public List<Tuple> act(ImplicitDomain domain, Permutation p) {
         return null;
     }
 

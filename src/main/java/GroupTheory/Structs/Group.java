@@ -3,64 +3,65 @@ package GroupTheory.Structs;
 import java.util.*;
 
 public class Group implements Iterable<Permutation> {
-    private final int n;
-    private final Permutation[] generators;
+    private int n;
+    private final List<Permutation> generators;
 
     public Group(Collection<Permutation> generators) {
         n = generators.size();
-        this.generators = new Permutation[n];
-        int i = 0;
+        this.generators = new ArrayList<>(n);
         for (Permutation generator : generators) {
-            this.generators[i] = generator;
-            i++;
+            if (!generator.isIdentity()) {
+                this.generators.add(generator);
+            }
+            else {
+                n--;
+            }
         }
+
+        cleanUp();
     }
 
     public Group(Permutation... generators) {
         n = generators.length;
-        this.generators = Arrays.copyOf(generators, n);
+        this.generators = new ArrayList<>(n);
+        for (Permutation generator : generators) {
+            if (!generator.isIdentity()) {
+                this.generators.add(generator);
+            }
+            else {
+                n--;
+            }
+        }
+
+        cleanUp();
+    }
+
+    private void cleanUp() {
+        if (n == 0) {
+            n = 1;
+            generators.add(new Permutation());
+        }
     }
 
     public boolean isTrivial() {
-        return n == 0;
+        return n == 1 && generators.get(0).isIdentity();
     }
 
     @Override
     public Iterator<Permutation> iterator() {
-        return new Iterator<>() {
-            private int i = 0;
-            private final int n = Group.this.n;
-            private final Permutation[] generators = Group.this.generators;
-
-            @Override
-            public boolean hasNext() {
-                return i < n;
-            }
-
-            @Override
-            public Permutation next() {
-                Permutation generator = generators[i];
-                i++;
-                return generator;
-            }
-        };
+        return Collections.unmodifiableList(generators).iterator();
     }
 
     @Override
     public String toString() {
-        if (isTrivial()) {
-            return "Group(())";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Group(");
+        for (int i = 0; i < n - 1; i++) {
+            sb.append(generators.get(i).toString());
+            sb.append(',');
         }
-        else {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Group(");
-            for (int i = 0; i < n - 1; i++) {
-                sb.append(generators[i].toString());
-                sb.append(',');
-            }
-            sb.append(generators[n - 1]);
-            sb.append(')');
-            return sb.toString();
-        }
+        sb.append(generators.get(n - 1).toString());
+        sb.append(')');
+        return sb.toString();
     }
 }

@@ -57,6 +57,10 @@ public class GAP implements GroupTheoryEngine {
         }
     }
 
+    public GAP(boolean log) {
+        this(System.getenv("GAP_HOME"), log, false);
+    }
+
     public GAP() {
         this(System.getenv("GAP_HOME"), false, true);
     }
@@ -139,6 +143,27 @@ public class GAP implements GroupTheoryEngine {
     }
 
     @Override
+    public Permutation listToPermutation(List<Integer> list) {
+        if (list.isEmpty()) {
+            throw new RuntimeException();
+        }
+
+        int n = list.size();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SortingPerm([");
+        for (int i = 0; i < n - 1; i++) {
+            sb.append(list.get(i));
+            sb.append(',');
+        }
+        sb.append(list.get(n - 1));
+        sb.append("])^-1;");
+
+        write(sb.toString());
+
+        return parsePermutation(read());
+    }
+
+    @Override
     public Permutation multiply(Permutation p, Permutation q) {
         if (performance && p.isIdentity()) {
             return q;
@@ -167,6 +192,44 @@ public class GAP implements GroupTheoryEngine {
     public FormalString permute(FormalString s, Permutation p) {
         write("Permuted(" + s.toString() + ", " + p.toString() + ");");
         return readFormalString();
+    }
+
+    @Override
+    public List<Integer> act(List<Integer> t, Permutation p) {
+        if (performance && t.isEmpty()) {
+            return t;
+        }
+        else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("OnTuples([");
+            int n = t.size();
+            for (int i = 0; i < n - 1; i++) {
+                sb.append(t.get(i));
+                sb.append(',');
+            }
+            sb.append(t.get(n - 1));
+            sb.append("], ");
+            sb.append(p.toString());
+            sb.append(");");
+            write(sb.toString());
+            return parseDigits(read());
+        }
+    }
+
+    @Override
+    public List<Tuple> act(ImplicitDomain domain, Permutation p) {
+        write("OnTuplesTuples(" + domain.toString() + ", " + p.toString() + ");");
+        List<Integer> in = parseDigits(read());
+        List<Tuple> ans = new ArrayList<>();
+        int i = 0;
+        while (i < in.size()) {
+            List<Integer> tuple = new ArrayList<>(domain.k());
+            for (int j = 0; j < domain.k(); j++, i++) {
+                tuple.add(in.get(i));
+            }
+            ans.add(new Tuple(tuple));
+        }
+        return ans;
     }
 
     @Override

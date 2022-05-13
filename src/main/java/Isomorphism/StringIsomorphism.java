@@ -1,32 +1,39 @@
 package Isomorphism;
 
-import GroupTheory.Engines.GAP;
 import GroupTheory.Engines.GroupTheoryEngine;
 import GroupTheory.Structs.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class StringIsomorphism {
-    // TODO: consider storing engine, s, t
-    public static boolean isIsomorphic(FormalString s, FormalString t, Group g) {
+public class StringIsomorphism {
+    private final GroupTheoryEngine engine;
+    private FormalString s;
+
+    public StringIsomorphism(GroupTheoryEngine engine) {
+        this.engine = engine;
+    }
+
+    public boolean isIsomorphic(FormalString s, FormalString t, Group g) {
+        return getIsomorphismCoset(s, t, g) != null;
+    }
+
+    public Coset getIsomorphismCoset(FormalString s, FormalString t, Group g) {
         int n = s.size();
         if (t.size() != n) {
-            return false;
+            return null;
         }
 
-        GroupTheoryEngine gap = new GAP();
+        this.s = s;
+
         Domain d = new ImplicitDomain(n, 1);
         Coset c = new Coset(g, new Permutation());
 
-        Coset iso = luks(gap, c, d, s, t);
-
-        gap.close();
-
-        return iso != null;
+        return luks(c, d, t);
     }
 
-    private static Coset union(GroupTheoryEngine engine, Coset x, Coset y) {
+    //  TODO: refactor to util
+    private Coset union(Coset x, Coset y) {
         if (x == null) {
             return y;
         }
@@ -45,13 +52,13 @@ public final class StringIsomorphism {
         return new Coset(new Group(generators), x.element());
     }
 
-    private static Coset luks(GroupTheoryEngine engine, Coset c, Domain d, FormalString s, FormalString t) {
+    private Coset luks(Coset c, Domain d, FormalString t) {
         if (c == null) {
             return null;
         }
 
         if (!c.element().isIdentity()) {
-            Coset tmp = luks(engine, new Coset(c.group(), new Permutation()), d, s, engine.permute(t, c.element()));
+            Coset tmp = luks(new Coset(c.group(), new Permutation()), d, engine.permute(t, c.element()));
             if (tmp == null) {
                 return null;
             }
@@ -74,7 +81,7 @@ public final class StringIsomorphism {
         if (!engine.isTransitive(g, d)) {
             List<Domain> orbits = engine.getOrbits(g, d);
             for (Domain orbit : orbits) {
-                Coset tmp = luks(engine, new Coset(g, new Permutation()), orbit, s, t);
+                Coset tmp = luks(new Coset(g, new Permutation()), orbit, t);
                 if (tmp == null) {
                     return null;
                 }
@@ -85,9 +92,9 @@ public final class StringIsomorphism {
 
         Group delta = engine.getMinimalBlockSystemStabilizer(g, d);
         List<Permutation> transversal = engine.getTransversal(g, delta);
-        Coset ans = luks(engine, new Coset(delta, transversal.get(0)), d, s, t);
+        Coset ans = luks(new Coset(delta, transversal.get(0)), d, t);
         for (int i = 1; i < transversal.size(); i++) {
-            ans = union(engine, ans, luks(engine, new Coset(delta, transversal.get(i)), d, s, t));
+            ans = union(ans, luks(new Coset(delta, transversal.get(i)), d, t));
         }
 
         return ans;

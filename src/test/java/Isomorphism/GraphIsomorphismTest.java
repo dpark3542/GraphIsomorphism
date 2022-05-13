@@ -4,21 +4,21 @@ import GraphTheory.Structs.Graph;
 import GraphTheory.Utilities.GraphGenerator;
 import GraphTheory.Utilities.GraphParser;
 import GroupTheory.Engines.GAP;
+import GroupTheory.Utilities.GroupAction;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class GraphIsomorphismTest {
-    private Graph readTestGraph(String filename) throws IOException {
+    private static Graph readTestGraph(String filename) throws IOException {
         return GraphParser.parseGraph(Files.readString(Path.of("src/test/resources/graphs/" + filename)));
     }
 
-    private void testMethod(Method method) {
+    private static void testMethod(Method method) {
 
         for (int i = 2; i <= 7; i++) {
             assertTrue(GraphIsomorphism.isIsomorphic(GraphGenerator.completeGraph(i), GraphGenerator.completeGraph(i), method));
@@ -47,20 +47,17 @@ class GraphIsomorphismTest {
     }
 
     @Test
-    void isIsomorphic() {
-        for (Method method : Method.values()) {
-            testMethod(method);
-        }
+    void testNaive() {
+        testMethod(Method.Naive);
     }
 
     @Test
-    void inducedAction() {
-        GAP gap = new GAP();
+    void testNauty() {
+        testMethod(Method.Nauty);
+    }
 
-        for (int i = 3; i <= 6; i++) {
-            assertEquals("S" + i, gap.identifyGroup(GraphIsomorphism.inducedAction(i)));
-        }
-
-        gap.close();
+    @Test
+    void testDegree() {
+        assertTrue(GraphIsomorphism.isIsomorphic(GraphGenerator.completeGraph(3), GraphGenerator.completeGraph(3), Method.Degree));
     }
 }

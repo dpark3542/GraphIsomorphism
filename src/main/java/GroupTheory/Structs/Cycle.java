@@ -29,7 +29,7 @@ public class Cycle implements Iterable<Integer> {
         }
         Set<Integer> s = new HashSet<>();
         for (int x : cycle) {
-            if (s.contains(x)) {
+            if (x < 1 || s.contains(x)) {
                 throw new RuntimeException();
             }
             s.add(x);

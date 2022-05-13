@@ -27,6 +27,9 @@ public final class GraphGenerator {
         if (n <= 0) {
             throw new IllegalArgumentException();
         }
+        else if (n <= 2) {
+            return completeGraph(n);
+        }
         List<List<Integer>> g = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             List<Integer> a = new ArrayList<>();

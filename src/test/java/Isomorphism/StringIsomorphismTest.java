@@ -1,9 +1,8 @@
 package Isomorphism;
 
-import GroupTheory.Structs.Cycle;
-import GroupTheory.Structs.FormalString;
-import GroupTheory.Structs.Group;
-import GroupTheory.Structs.Permutation;
+import GroupTheory.Engines.GAP;
+import GroupTheory.Engines.GroupTheoryEngine;
+import GroupTheory.Structs.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,13 +11,38 @@ class StringIsomorphismTest {
 
     @Test
     void isIsomorphic() {
+        GroupTheoryEngine gap = new GAP();
+        StringIsomorphism si = new StringIsomorphism(gap);
+
         Group g = new Group(new Permutation(new Cycle(1, 2)));
-        assertTrue(StringIsomorphism.isIsomorphic(new FormalString(1, 2), new FormalString(2, 1), g));
-        assertFalse(StringIsomorphism.isIsomorphic(new FormalString(1, 2), new FormalString(3, 1), g));
-        assertTrue(StringIsomorphism.isIsomorphic(new FormalString(1, 1), new FormalString(1, 1), g));
+        assertTrue(si.isIsomorphic(new FormalString(1, 2), new FormalString(2, 1), g));
+        assertFalse(si.isIsomorphic(new FormalString(1, 2), new FormalString(3, 1), g));
+        assertTrue(si.isIsomorphic(new FormalString(1, 1), new FormalString(1, 1), g));
 
         g = new Group(new Permutation(new Cycle(2, 3, 4)));
-        assertTrue(StringIsomorphism.isIsomorphic(new FormalString(1, 2, 3, 4, 5), new FormalString(1, 4, 2, 3, 5), g));
-        assertFalse(StringIsomorphism.isIsomorphic(new FormalString(1, 2, 3, 4, 5), new FormalString(2, 1, 3, 4, 5), g));
+        assertTrue(si.isIsomorphic(new FormalString(1, 2, 3, 4, 5), new FormalString(1, 4, 2, 3, 5), g));
+        assertFalse(si.isIsomorphic(new FormalString(1, 2, 3, 4, 5), new FormalString(2, 1, 3, 4, 5), g));
+
+        g = new Group(new Permutation(new Cycle(3, 4)));
+        assertTrue(si.isIsomorphic(new FormalString(1, 1, 1, 2, 2, 1), new FormalString(1, 1, 1, 2, 2, 1), g));
+    }
+
+    @Test
+    void getIsomorphismCoset() {
+        GroupTheoryEngine gap = new GAP();
+        StringIsomorphism si = new StringIsomorphism(gap);
+
+        Group g = new Group(new Permutation(new Cycle(3, 4)));
+        Coset coset = si.getIsomorphismCoset(new FormalString(1, 1, 1, 2, 2, 1), new FormalString(1, 1, 1, 2, 2, 1), g);
+        assertNotNull(coset.group());
+        assertTrue(coset.group().isTrivial());
+        assertTrue(coset.element().isIdentity());
+
+        coset = si.getIsomorphismCoset(new FormalString(1, 1, 2, 2, 1, 1), new FormalString(1, 1, 2, 2, 1, 1), g);
+        assertNotNull(coset.group());
+        assertEquals("Group((3,4))", coset.group().toString());
+        assertTrue(coset.element().isIdentity());
+
+        gap.close();
     }
 }

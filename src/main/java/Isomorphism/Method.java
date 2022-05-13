@@ -1,5 +1,5 @@
 package Isomorphism;
 
 public enum Method {
-    Naive, Nauty
+    Naive, Nauty, Degree
 }

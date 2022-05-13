@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GAP implements GroupTheoryEngine {
-    private final boolean log;
+    private final boolean log, performance;
     private final Process process;
     private final BufferedReader in;
     private final PrintWriter out;
@@ -25,12 +25,17 @@ public class GAP implements GroupTheoryEngine {
 
     private static final Pattern permutationPattern = Pattern.compile("(\\([()\\d,]+\\)|\\(\\))"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
 
-    public GAP(String location, boolean log) {
+    public GAP(String location, boolean log, boolean performance) {
+        if (location == null) {
+            throw new IllegalArgumentException();
+        }
         if (!location.endsWith("/")) {
             location += '/';
         }
         location += "gap";
         this.log = log;
+
+        this.performance = performance;
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
@@ -53,7 +58,7 @@ public class GAP implements GroupTheoryEngine {
     }
 
     public GAP() {
-        this(System.getenv("GAP_HOME"), false);
+        this(System.getenv("GAP_HOME"), false, true);
     }
 
     private void write(String s) {
@@ -135,14 +140,27 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public Permutation multiply(Permutation p, Permutation q) {
-        write(p.toString() + '*' + q.toString() + ';');
-        return parsePermutation(read());
+        if (performance && p.isIdentity()) {
+            return q;
+        }
+        else if (performance && q.isIdentity()) {
+            return p;
+        }
+        else {
+            write(p.toString() + '*' + q.toString() + ';');
+            return parsePermutation(read());
+        }
     }
 
     @Override
     public Permutation invert(Permutation p) {
-        write(p.toString() + "^-1" + ';');
-        return parsePermutation(read());
+        if (performance && p.isIdentity()) {
+            return p;
+        }
+        else {
+            write(p.toString() + "^-1" + ';');
+            return parsePermutation(read());
+        }
     }
 
     @Override
@@ -165,8 +183,13 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public boolean isTransitive(Group g, Domain d) {
-        write("IsTransitive(" + g.toString() + ", " + d.toString() + ", OnSets);");
-        return readBoolean();
+        if (performance && g.isTrivial()) {
+            return d.size() == 1;
+        }
+        else {
+            write("IsTransitive(" + g.toString() + ", " + d.toString() + ", OnSets);");
+            return readBoolean();
+        }
     }
 
     private static Domain parseDomain(Node node) {
@@ -185,14 +208,20 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public List<Domain> getOrbits(Group g, Domain d) {
-        write("OrbitsDomain(" + g.toString() + ", " + d.toString() + ", OnSets);");
-
         List<Domain> orbits = new ArrayList<>();
-        Node tree = NestedParser.parse(read());
-        for (Node child : tree) {
-            orbits.add(parseDomain(child));
+        if (performance && g.isTrivial()) {
+            for (Tuple tuple : d) {
+                orbits.add(new ExplicitDomain(tuple));
+            }
         }
+        else {
+            write("OrbitsDomain(" + g.toString() + ", " + d.toString() + ", OnSets);");
 
+            Node tree = NestedParser.parse(read());
+            for (Node child : tree) {
+                orbits.add(parseDomain(child));
+            }
+        }
         return orbits;
     }
 
@@ -213,7 +242,7 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public Group getMinimalBlockSystemStabilizer(Group g, Domain d) {
-        if (!isTransitive(g, d)) {
+        if (!performance && !isTransitive(g, d)) {
             throw new RuntimeException();
         }
 
@@ -238,13 +267,19 @@ public class GAP implements GroupTheoryEngine {
 
     @Override
     public List<Permutation> getTransversal(Group g, Group h) {
-        if (!isSubgroup(g, h)) {
+        if (!performance && !isSubgroup(g, h)) {
             throw new RuntimeException();
         }
 
         write("Elements(RightTransversal(" + g.toString() + ", " + h.toString() + "));");
 
         return parsePermutations(read());
+    }
+
+    public String identifyGroup(Group g) {
+        write("StructureDescription(" + g.toString() + ");");
+        String s = read();
+        return s.substring(1, s.length() - 1);
     }
 
     public void close() {

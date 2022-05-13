@@ -39,11 +39,6 @@ public class Permutation implements Iterable<Cycle> {
         return n == 0;
     }
 
-    // TODO: refactor
-    public int[] image(int max) {
-        return null;
-    }
-
     @Override
     public Iterator<Cycle> iterator() {
         return new Iterator<>() {

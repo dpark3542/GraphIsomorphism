@@ -11,7 +11,10 @@ public class Nauty {
     private String location;
 
     public Nauty(String location) {
-        if (location.endsWith("/")) {
+        if (location == null) {
+            throw new IllegalArgumentException();
+        }
+        else if (location.endsWith("/")) {
             this.location = location.substring(0, location.length() - 1);
         }
         else {

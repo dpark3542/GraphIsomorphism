@@ -1,6 +1,7 @@
 package GraphTheory.Structs;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class AdjacencyMatrixGraph implements Graph {
@@ -41,17 +42,37 @@ public class AdjacencyMatrixGraph implements Graph {
 
     @Override
     public boolean isAdjacent(int u, int v) {
-        return g[u - 1][v - 1];
+        return g[u][v];
     }
 
     @Override
     public List<Integer> getNeighbors(int v) {
         List<Integer> neighbors = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            if (g[i][v - 1]) {
+            if (g[i][v]) {
                 neighbors.add(i);
             }
         }
         return neighbors;
+    }
+
+    @Override
+    public Graph getSubgraph(Collection<Integer> subset) {
+        int[] map = new int[getSize()];
+        int k = 0, m = subset.size();
+        for (int j : subset) {
+            map[k] = j;
+            k++;
+        }
+        boolean[][] h = new boolean[m][m];
+        for (int i : subset) {
+            for (int j : subset) {
+                if (i < j && isAdjacent(i, j)) {
+                    h[map[i]][map[j]] = true;
+                    h[map[j]][map[i]] = true;
+                }
+            }
+        }
+        return new AdjacencyMatrixGraph(h);
     }
 }

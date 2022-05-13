@@ -1,6 +1,7 @@
 package GraphTheory.Structs;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,11 +41,34 @@ public class AdjacencyListGraph implements Graph {
 
     @Override
     public boolean isAdjacent(int u, int v) {
-        return g.get(u - 1).contains(v - 1);
+        return g.get(u).contains(v);
     }
 
     @Override
     public List<Integer> getNeighbors(int v) {
-        return Collections.unmodifiableList(g.get(v - 1));
+        return Collections.unmodifiableList(g.get(v));
+    }
+
+    @Override
+    public Graph getSubgraph(Collection<Integer> subset) {
+        int[] map = new int[getSize()];
+        int k = 0, m = subset.size();
+        for (int j : subset) {
+            map[k] = j;
+            k++;
+        }
+        List<List<Integer>> h = new ArrayList<>();
+        for (int i = 0; i < m; i++) {
+            h.add(new ArrayList<>());
+        }
+        for (int i : subset) {
+            for (int j : subset) {
+                if (i < j && isAdjacent(i, j)) {
+                    h.get(map[i]).add(map[j]);
+                    h.get(map[j]).add(map[i]);
+                }
+            }
+        }
+        return new AdjacencyListGraph(h);
     }
 }

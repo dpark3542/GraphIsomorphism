@@ -38,23 +38,7 @@ public class Cycle implements Iterable<Integer> {
 
     @Override
     public Iterator<Integer> iterator() {
-        return new Iterator<>() {
-            private int i = 0;
-            private final int n = Cycle.this.n;
-            private final int[] cycle = Cycle.this.cycle;
-
-            @Override
-            public boolean hasNext() {
-                return i < n;
-            }
-
-            @Override
-            public Integer next() {
-                int x = cycle[i];
-                i++;
-                return x;
-            }
-        };
+        return Arrays.stream(cycle).iterator();
     }
 
     @Override

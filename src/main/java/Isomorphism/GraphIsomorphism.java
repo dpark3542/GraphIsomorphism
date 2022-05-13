@@ -16,7 +16,7 @@ public final class GraphIsomorphism {
         List<Integer> a = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
-                if (graph.isAdjacent(i + 1, j + 1)) {
+                if (graph.isAdjacent(i, j)) {
                     a.add(2);
                 }
                 else {
@@ -30,8 +30,8 @@ public final class GraphIsomorphism {
     /**
      * Natural map from \binom{[n]}{2} to [\binom{n}{2}].
      *
-     * @param i first coordinate
-     * @param j second coordinate
+     * @param i first element
+     * @param j second element
      * @return image
      */
     private static int convert(int i, int j, int n) {
@@ -44,7 +44,7 @@ public final class GraphIsomorphism {
     /**
      * S_n naturally acts on the 2-element subsets of [n].
      * This function returns the associated permutation representation of that action.
-     * Hence we return a subgroup of S_{\binom{[n]}{2}} isomorphic to S_n where we identify S_{\binom{[n]}{2}} with S_{\binom{n}{2}} instead.
+     * Hence, we return a subgroup of S_{\binom{[n]}{2}} isomorphic to S_n where we identify S_{\binom{[n]}{2}} with S_{\binom{n}{2}} instead.
      * (Note there are multiple subgroups isomorphic to S_n. We are returning the one associated by this action.)
      *
      * @param n parameter
@@ -83,6 +83,11 @@ public final class GraphIsomorphism {
         return new Group(new Permutation(a), new Permutation(b));
     }
 
+    private static boolean isDegreeIsomorphic(Graph g, Graph h) {
+        // TODO:
+        return false;
+    }
+
     public static boolean isIsomorphic(Graph g, Graph h, Method method) {
         int n = g.getSize();
         if (h.getSize() != n) {
@@ -99,6 +104,9 @@ public final class GraphIsomorphism {
         else if (method == Method.Nauty) {
             Nauty nauty = new Nauty();
             return nauty.isIsomorphic(g, h);
+        }
+        else if (method == Method.Degree) {
+            return isDegreeIsomorphic(g, h);
         }
         else {
             throw new UnsupportedOperationException();

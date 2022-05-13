@@ -52,7 +52,7 @@ public final class GraphIsomorphism {
             return nauty.isIsomorphic(g, h);
         }
         else if (method == Method.Degree) {
-            GAP gap = new GAP(true);
+            GAP gap = new GAP();
             DegreeGraphIsomorphism dgi = new DegreeGraphIsomorphism(gap);
             boolean result = dgi.isDegreeIsomorphic(g, h);
             gap.close();

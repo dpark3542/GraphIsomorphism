@@ -58,6 +58,11 @@ class GraphIsomorphismTest {
 
     @Test
     void testDegree() {
-        assertTrue(GraphIsomorphism.isIsomorphic(GraphGenerator.completeGraph(3), GraphGenerator.completeGraph(3), Method.Degree));
+        for (int i = 2; i <= 4; i++) {
+            assertTrue(GraphIsomorphism.isIsomorphic(GraphGenerator.completeGraph(i), GraphGenerator.completeGraph(i), Method.Degree));
+            assertTrue(GraphIsomorphism.isIsomorphic(GraphGenerator.cycleGraph(i), GraphGenerator.cycleGraph(i), Method.Degree));
+        }
+
+        assertFalse(GraphIsomorphism.isIsomorphic(GraphGenerator.completeGraph(4), GraphGenerator.cycleGraph(4), Method.Degree));
     }
 }

@@ -19,6 +19,7 @@ public class DegreeGraphIsomorphism {
         this.engine = engine;
     }
 
+    // TODO: refactor
     private static List<List<Integer>> copyList(List<List<Integer>> a) {
         List<List<Integer>> b = new ArrayList<>();
         for (int i = 0; i < a.size(); i++) {
@@ -30,6 +31,7 @@ public class DegreeGraphIsomorphism {
         return b;
     }
 
+    // TODO: refactor
     private static void copyGraph(List<List<Integer>> a, Graph g, int offset) {
         int n = g.getSize();
         for (int i = 0; i < n; i++) {
@@ -43,6 +45,7 @@ public class DegreeGraphIsomorphism {
     }
 
     private Group getAutomorphismsFixingEdge(Graph graph, int e1, int e2) {
+        // TODO: refactor to graph util
         boolean[] mkd = new boolean[graph.getSize()];
         Deque<Integer> q = new ArrayDeque<>();
         q.add(e1);
@@ -94,18 +97,15 @@ public class DegreeGraphIsomorphism {
             for (int u : bfs.get(level)) {
                 for (int v : bfs.get(level)) {
                     if (u < v && graph.isAdjacent(u, v)) {
-                        edges.add(new Tuple(u, v));
+                        // TODO: make graphs 1-indexed!
+                        edges.add(new Tuple(u + 1, v + 1));
                     }
                 }
             }
 
             // kernel of pi
             for (List<Integer> preimage : f.values()) {
-                List<Integer> tmp = new ArrayList<>();
-                for (int x : preimage) {
-                    tmp.add(x);
-                }
-                for (Permutation permutation : GroupGenerator.symmetricGroup(tmp)) {
+                for (Permutation permutation : GroupGenerator.symmetricGroup(preimage)) {
                     generators.add(permutation);
                 }
             }
@@ -116,16 +116,16 @@ public class DegreeGraphIsomorphism {
                 // TODO: use binomial(bfs.get(level - 1).size(), t) memory instead
                 List<Integer> l = new ArrayList<>(binomial(2 * n + 2, t));
                 for (Tuple tuple : new ImplicitDomain(2 * n + 2, t)) {
+                    int offset = 0;
+                    if (t == 2 && edges.contains(tuple)) {
+                        offset = 2 * n + 2;
+                    }
+
                     if (f.containsKey(tuple)) {
-                        if (t == 2 && edges.contains(tuple)) {
-                            l.add(f.get(tuple).size() + 2 * n + 3);
-                        }
-                        else {
-                            l.add(f.get(tuple).size() + 1);
-                        }
+                        l.add(f.get(tuple).size() + 1 + offset);
                     }
                     else {
-                        l.add(1);
+                        l.add(1 + offset);
                     }
                 }
 
@@ -133,7 +133,7 @@ public class DegreeGraphIsomorphism {
                 StringIsomorphism si = new StringIsomorphism(engine);
                 Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, image, 2 * n + 2, t));
 
-                // Image cannot be nonempty.
+                // Image cannot be empty.
                 // By (4.2), iso(s, t) is a coset of iso(s, s). We are calling it when s = t, so we should get a group.
                 // Image of a homomorphism is a group anyway.
                 if (coset == null || !coset.element().isIdentity()) {
@@ -187,6 +187,41 @@ public class DegreeGraphIsomorphism {
             group = new Group(generators);
         }
 
+        // stabilize edges in last bfs layer
+        Set<Tuple> edges = new HashSet<>();
+        level = bfs.size() - 1;
+        for (int u : bfs.get(level)) {
+            for (int v : bfs.get(level)) {
+                if (u < v && graph.isAdjacent(u, v)) {
+                    // TODO: make graphs 1-indexed!
+                    edges.add(new Tuple(u + 1, v + 1));
+                }
+            }
+        }
+
+        for (int t = 1; t <= d; t++) {
+            // TODO: use binomial(bfs.get(level - 1).size(), t) memory instead
+            List<Integer> l = new ArrayList<>(binomial(2 * n + 2, t));
+            for (Tuple tuple : new ImplicitDomain(2 * n + 2, t)) {
+                int offset = 0;
+                if (t == 2 && edges.contains(tuple)) {
+                    offset = 2 * n + 2;
+                }
+
+                l.add(1 + offset);
+            }
+
+            FormalString s = new FormalString(l);
+            StringIsomorphism si = new StringIsomorphism(engine);
+            Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, group, 2 * n + 2, t));
+
+            if (coset == null || !coset.element().isIdentity()) {
+                throw new RuntimeException();
+            }
+
+            group = pullbackAction(engine, coset.group(), 2 * n + 2, t);
+        }
+
         return group;
     }
 
@@ -210,6 +245,7 @@ public class DegreeGraphIsomorphism {
                     a.add(new ArrayList<>());
                 }
                 copyGraph(a, g, 0);
+                // TODO: addEdge and removeEdge utility functions
                 a.get(u).remove((Integer) v);
                 a.get(v).remove((Integer) u);
                 a.get(u).add(2 * n);

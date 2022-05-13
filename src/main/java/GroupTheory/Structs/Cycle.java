@@ -23,6 +23,14 @@ public class Cycle implements Iterable<Integer> {
         check();
     }
 
+    public int size() {
+        return n;
+    }
+
+    public int get(int i) {
+        return cycle[i];
+    }
+
     private void check() {
         if (n <= 1) {
             throw new RuntimeException();

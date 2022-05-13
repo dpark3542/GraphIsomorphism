@@ -10,13 +10,10 @@ class GroupActionTest {
 
     @Test
     void inducedAction() {
-        GAP gap = new GAP(true);
-
-        Group g = GroupAction.inducedAction(gap, GroupGenerator.symmetricGroup(2), 2, 2);
-        assertEquals(1, gap.getOrder(g));
+        GAP gap = new GAP();
 
         for (int i = 3; i <= 6; i++) {
-            g = GroupAction.inducedAction(gap, GroupGenerator.symmetricGroup(i), i, 2);
+            Group g = GroupAction.inducedAction(gap, GroupGenerator.symmetricGroup(i), i, 2);
             assertEquals("S" + i, gap.identifyGroup(g));
         }
 
@@ -25,6 +22,14 @@ class GroupActionTest {
 
     @Test
     void pullbackAction() {
-        // TODO:
+        GAP gap = new GAP(true);
+
+        for (int i = 3; i <= 6; i++) {
+            Group g = GroupAction.inducedAction(gap, GroupGenerator.symmetricGroup(i), i, 2);
+            g = GroupAction.pullbackAction(gap, g, i, 2);
+            assertEquals("S" + i, gap.identifyGroup(g));
+        }
+
+        gap.close();
     }
 }

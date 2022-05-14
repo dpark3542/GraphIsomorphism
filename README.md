@@ -17,8 +17,8 @@ Graphs can also be generated using methods from `GraphGenerator`.
 ## Graph Isomorphism
 Test isomorphism of graphs using `GraphIsomorphism.isIsomorphic`. Currently three methods of graph isomorphism are implemented.
 
-- Naive: The edges of both graphs are encoded as strings and passed to string isomorphism with the induced action of ![S_n](https://latex.codecogs.com/svg.image?S_n) on ![Sym(\binom{[n]}{k})](https://latex.codecogs.com/svg.image?\text{Sym}\left(\binom{[n]}{k}\right)).
 - Nauty: Use nauty's suite of programs to determine isomorphism.
+- Naive: Reduce to a single call of string isomorphism. The strings encode the edges of the graphs. The group is the induced action of S<sub>n</sub> acting on the family of 2-element subsets of [n].
 - Degree: Implementation of Luks's original reduction from bounded degree graph isomorphism to string isomorphism.
 
 Certificates are currently not implemented.

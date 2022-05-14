@@ -5,20 +5,24 @@ import java.util.Collection;
 import java.util.List;
 
 public class AdjacencyMatrixGraph implements Graph {
-    private final int n;
+    private int n, m;
     private final boolean[][] g;
 
-    public AdjacencyMatrixGraph(boolean[][] m) {
-        n = m.length;
-        if (n != m[0].length) {
+    public AdjacencyMatrixGraph(boolean[][] g) {
+        n = g.length;
+        if (n != g[0].length) {
             throw new IllegalArgumentException();
         }
-        g = new boolean[n][n];
+        this.g = new boolean[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                g[i][j] = m[i][j];
+                this.g[i][j] = g[i][j];
+                if (g[i][j]) {
+                    m++;
+                }
             }
         }
+        m /= 2;
         check();
     }
 
@@ -36,8 +40,13 @@ public class AdjacencyMatrixGraph implements Graph {
     }
 
     @Override
-    public int getSize() {
+    public int getNumVertices() {
         return n;
+    }
+
+    @Override
+    public int getNumEdges() {
+        return m;
     }
 
     @Override
@@ -58,7 +67,7 @@ public class AdjacencyMatrixGraph implements Graph {
 
     @Override
     public Graph getSubgraph(Collection<Integer> subset) {
-        int[] map = new int[getSize()];
+        int[] map = new int[getNumVertices()];
         int k = 0, m = subset.size();
         for (int j : subset) {
             map[k] = j;

@@ -13,7 +13,7 @@ import java.util.List;
 
 public final class GraphIsomorphism {
     private static FormalString graphToString(Graph graph) {
-        int n = graph.getSize();
+        int n = graph.getNumVertices();
         List<Integer> a = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
@@ -29,8 +29,8 @@ public final class GraphIsomorphism {
     }
 
     public static boolean isIsomorphic(Graph g, Graph h, Method method) {
-        int n = g.getSize();
-        if (h.getSize() != n) {
+        int n = g.getNumVertices();
+        if (h.getNumVertices() != n) {
             return false;
         }
 

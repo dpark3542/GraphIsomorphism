@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class AdjacencyListGraph implements Graph {
-    private final int n;
+    private int n, m;
     private final List<List<Integer>> g;
 
     public AdjacencyListGraph(List<List<Integer>> g) {
@@ -14,7 +14,9 @@ public class AdjacencyListGraph implements Graph {
         this.g = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             this.g.add(List.copyOf(g.get(i)));
+            m += g.get(i).size();
         }
+        m /= 2;
         check();
     }
 
@@ -35,8 +37,13 @@ public class AdjacencyListGraph implements Graph {
     }
 
     @Override
-    public int getSize() {
+    public int getNumVertices() {
         return n;
+    }
+
+    @Override
+    public int getNumEdges() {
+        return m;
     }
 
     @Override
@@ -51,7 +58,7 @@ public class AdjacencyListGraph implements Graph {
 
     @Override
     public Graph getSubgraph(Collection<Integer> subset) {
-        int[] map = new int[getSize()];
+        int[] map = new int[getNumVertices()];
         int k = 0, m = subset.size();
         for (int j : subset) {
             map[k] = j;

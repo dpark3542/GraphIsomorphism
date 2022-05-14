@@ -33,7 +33,7 @@ public class DegreeGraphIsomorphism {
 
     // TODO: refactor
     private static void copyGraph(List<List<Integer>> a, Graph g, int offset) {
-        int n = g.getSize();
+        int n = g.getNumVertices();
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
                 if (g.isAdjacent(i, j)) {
@@ -44,9 +44,9 @@ public class DegreeGraphIsomorphism {
         }
     }
 
-    private Group getAutomorphismsFixingEdge(Graph graph, int e1, int e2) {
+    private Group getAutomorphismsStabilizingEdge(Graph graph, int e1, int e2) {
         // TODO: refactor to graph util
-        boolean[] mkd = new boolean[graph.getSize()];
+        boolean[] mkd = new boolean[graph.getNumVertices()];
         Deque<Integer> q = new ArrayDeque<>();
         q.add(e1);
         q.add(e2);
@@ -226,68 +226,73 @@ public class DegreeGraphIsomorphism {
     }
 
     public boolean isDegreeIsomorphic(Graph g, Graph h) {
-        n = g.getSize();
-
+        n = g.getNumVertices();
         d = 0;
         for (int i = 0; i < n; i++) {
             d = Math.max(d, g.getNeighbors(i).size());
             d = Math.max(d, h.getNeighbors(i).size());
         }
 
-        for (int u = 0; u < n; u++) {
-            for (int v : g.getNeighbors(u)) {
-                if (u > v) {
+        // TODO: add performance flag for edge check or add this logic to GraphIsomorphism
+        if (g.getNumEdges() == 0) {
+            return h.getNumEdges() == 0;
+        }
+
+        int u = 0, v = 0;
+        for (int i = 0; i < n; i++) {
+            if (!g.getNeighbors(i).isEmpty()) {
+                u = i;
+                v = g.getNeighbors(i).get(0);
+                break;
+            }
+        }
+
+        List<List<Integer>> a = new ArrayList<>();
+        for (int i = 0; i < 2 * n + 2; i++) {
+            a.add(new ArrayList<>());
+        }
+        copyGraph(a, g, 0);
+        // TODO: addEdge and removeEdge utility functions
+        a.get(u).remove((Integer) v);
+        a.get(v).remove((Integer) u);
+        a.get(u).add(2 * n);
+        a.get(2 * n).add(u);
+        a.get(v).add(2 * n);
+        a.get(2 * n).add(v);
+        a.get(2 * n).add(2 * n + 1);
+        a.get(2 * n + 1).add(2 * n);
+
+        for (int w = 0; w < n; w++) {
+            for (int x : h.getNeighbors(w)) {
+                if (w > x) {
                     continue;
                 }
+                // find isomorphism mapping {u, v} to {w, x}
 
-                List<List<Integer>> a = new ArrayList<>();
-                for (int i = 0; i < 2 * n + 2; i++) {
-                    a.add(new ArrayList<>());
-                }
-                copyGraph(a, g, 0);
-                // TODO: addEdge and removeEdge utility functions
-                a.get(u).remove((Integer) v);
-                a.get(v).remove((Integer) u);
-                a.get(u).add(2 * n);
-                a.get(2 * n).add(u);
-                a.get(v).add(2 * n);
-                a.get(2 * n).add(v);
-                a.get(2 * n).add(2 * n + 1);
-                a.get(2 * n + 1).add(2 * n);
+                List<List<Integer>> b = copyList(a);
+                copyGraph(b, h, n);
+                b.get(w + n).remove((Integer) (x + n));
+                b.get(x + n).remove((Integer) (w + n));
+                b.get(w + n).add(2 * n + 1);
+                b.get(2 * n + 1).add(w + n);
+                b.get(x + n).add(2 * n + 1);
+                b.get(2 * n + 1).add(x + n);
 
-                for (int w = 0; w < n; w++) {
-                    for (int x : h.getNeighbors(w)) {
-                        if (w > x) {
-                            continue;
-                        }
-                        // find isomorphism mapping {u, v} to {w, x}
+                Group group = getAutomorphismsStabilizingEdge(new AdjacencyListGraph(b), 2 * n, 2 * n + 1);
 
-                        List<List<Integer>> b = copyList(a);
-                        copyGraph(b, h, n);
-                        b.get(w + n).remove((Integer) (x + n));
-                        b.get(x + n).remove((Integer) (w + n));
-                        b.get(w + n).add(2 * n + 1);
-                        b.get(2 * n + 1).add(w + n);
-                        b.get(x + n).add(2 * n + 1);
-                        b.get(2 * n + 1).add(x + n);
-
-                        Group group = getAutomorphismsFixingEdge(new AdjacencyListGraph(b), 2 * n, 2 * n + 1);
-
-                        for (Permutation generator : group) {
-                            for (Cycle cycle : generator) {
-                                boolean r = false, s = false;
-                                for (int t : cycle) {
-                                    if (t <= n) {
-                                        r = true;
-                                    }
-                                    else if (t <= 2 * n) {
-                                        s = true;
-                                    }
-                                }
-                                if (r && s) {
-                                    return true;
-                                }
+                for (Permutation generator : group) {
+                    for (Cycle cycle : generator) {
+                        boolean r = false, s = false;
+                        for (int t : cycle) {
+                            if (t <= n) {
+                                r = true;
                             }
+                            else if (t <= 2 * n) {
+                                s = true;
+                            }
+                        }
+                        if (r && s) {
+                            return true;
                         }
                     }
                 }

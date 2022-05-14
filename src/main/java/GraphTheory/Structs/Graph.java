@@ -4,7 +4,19 @@ import java.util.Collection;
 import java.util.List;
 
 public interface Graph {
-    public int getSize();
+    /**
+     * Returns number of vertices.
+     *
+     * @return number of vertices.
+     */
+    public int getNumVertices();
+
+    /**
+     * Returns number of edges.
+     *
+     * @return number of edges
+     */
+    public int getNumEdges();
     public boolean isAdjacent(int u, int v);
 
     /**

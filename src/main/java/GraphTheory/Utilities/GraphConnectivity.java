@@ -9,7 +9,7 @@ import java.util.List;
 
 public final class GraphConnectivity {
     public static boolean isConnected(Graph g) {
-        int n = g.getSize();
+        int n = g.getNumVertices();
         boolean[] mkd = new boolean[n];
         Deque<Integer> st = new ArrayDeque<>();
         st.addLast(0);
@@ -33,7 +33,7 @@ public final class GraphConnectivity {
     }
 
     public static List<Graph> getConnectedComponents(Graph g) {
-        int n = g.getSize();
+        int n = g.getNumVertices();
         boolean[] mkd = new boolean[n];
         Deque<Integer> st = new ArrayDeque<>();
         List<Graph> components = new ArrayList<>();

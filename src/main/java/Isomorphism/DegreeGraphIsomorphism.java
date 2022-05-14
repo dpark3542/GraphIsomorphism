@@ -19,19 +19,16 @@ public class DegreeGraphIsomorphism {
         this.engine = engine;
     }
 
-    // TODO: refactor
-    private static List<List<Integer>> copyList(List<List<Integer>> a) {
-        List<List<Integer>> b = new ArrayList<>();
-        for (int i = 0; i < a.size(); i++) {
-            b.add(new ArrayList<>());
-            for (int j : a.get(i)) {
-                b.get(i).add(j);
-            }
-        }
-        return b;
+    private static void addEdge(List<List<Integer>> a, int u, int v) {
+        a.get(u).add(v);
+        a.get(v).add(u);
     }
 
-    // TODO: refactor
+    private static void removeEdge(List<List<Integer>> a, int u, int v) {
+        a.get(u).remove((Integer) v);
+        a.get(v).remove((Integer) u);
+    }
+
     private static void copyGraph(List<List<Integer>> a, Graph g, int offset) {
         int n = g.getNumVertices();
         for (int i = 0; i < n; i++) {
@@ -252,15 +249,11 @@ public class DegreeGraphIsomorphism {
             a.add(new ArrayList<>());
         }
         copyGraph(a, g, 0);
-        // TODO: addEdge and removeEdge utility functions
-        a.get(u).remove((Integer) v);
-        a.get(v).remove((Integer) u);
-        a.get(u).add(2 * n);
-        a.get(2 * n).add(u);
-        a.get(v).add(2 * n);
-        a.get(2 * n).add(v);
-        a.get(2 * n).add(2 * n + 1);
-        a.get(2 * n + 1).add(2 * n);
+        copyGraph(a, h, n);
+        removeEdge(a, u, v);
+        addEdge(a, u, 2 * n);
+        addEdge(a, v, 2 * n);
+        addEdge(a, 2 * n, 2 * n + 1);
 
         for (int w = 0; w < n; w++) {
             for (int x : h.getNeighbors(w)) {
@@ -268,17 +261,11 @@ public class DegreeGraphIsomorphism {
                     continue;
                 }
                 // find isomorphism mapping {u, v} to {w, x}
+                removeEdge(a, w + n, x + n);
+                addEdge(a, w + n, 2 * n + 1);
+                addEdge(a, x + n, 2 * n + 1);
 
-                List<List<Integer>> b = copyList(a);
-                copyGraph(b, h, n);
-                b.get(w + n).remove((Integer) (x + n));
-                b.get(x + n).remove((Integer) (w + n));
-                b.get(w + n).add(2 * n + 1);
-                b.get(2 * n + 1).add(w + n);
-                b.get(x + n).add(2 * n + 1);
-                b.get(2 * n + 1).add(x + n);
-
-                Group group = getAutomorphismsStabilizingEdge(new AdjacencyListGraph(b), 2 * n, 2 * n + 1);
+                Group group = getAutomorphismsStabilizingEdge(new AdjacencyListGraph(a), 2 * n, 2 * n + 1);
 
                 for (Permutation generator : group) {
                     for (Cycle cycle : generator) {
@@ -296,6 +283,10 @@ public class DegreeGraphIsomorphism {
                         }
                     }
                 }
+
+                addEdge(a, w + n, x + n);
+                removeEdge(a, w + n, 2 * n + 1);
+                removeEdge(a, x + n, 2 * n + 1);
             }
         }
 

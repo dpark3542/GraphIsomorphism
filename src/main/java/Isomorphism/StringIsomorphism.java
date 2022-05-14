@@ -32,8 +32,15 @@ public class StringIsomorphism {
         return luks(c, d, t);
     }
 
-    //  TODO: refactor to util
-    private Coset union(Coset x, Coset y) {
+    /**
+     * Returns closure of union of two cosets.
+     * Does not actually give union of two cosets!
+     *
+     * @param x first coset
+     * @param y second coset
+     * @return closure of union of cosets
+     */
+    private Coset unionClosure(Coset x, Coset y) {
         if (x == null) {
             return y;
         }
@@ -94,7 +101,8 @@ public class StringIsomorphism {
         List<Permutation> transversal = engine.getTransversal(g, delta);
         Coset ans = luks(new Coset(delta, transversal.get(0)), d, t);
         for (int i = 1; i < transversal.size(); i++) {
-            ans = union(ans, luks(new Coset(delta, transversal.get(i)), d, t));
+            // closure of union is fine since result should be a group
+            ans = unionClosure(ans, luks(new Coset(delta, transversal.get(i)), d, t));
         }
 
         return ans;

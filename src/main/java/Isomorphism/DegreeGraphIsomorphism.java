@@ -9,7 +9,10 @@ import GroupTheory.Utilities.GroupGenerator;
 
 import java.util.*;
 
-import static GroupTheory.Utilities.GroupAction.*;
+import static GraphTheory.Utilities.GraphConnectivity.breadthFirstSearch;
+import static GraphTheory.Utilities.GraphConnectivity.isConnected;
+import static GroupTheory.Utilities.GroupAction.binomial;
+import static GroupTheory.Utilities.GroupAction.pullbackAction;
 
 public class DegreeGraphIsomorphism {
     private final GroupTheoryEngine engine;
@@ -42,35 +45,12 @@ public class DegreeGraphIsomorphism {
     }
 
     private Group getAutomorphismsStabilizingEdge(Graph graph, int e1, int e2) {
-        // TODO: refactor to graph util
-        boolean[] mkd = new boolean[graph.getNumVertices()];
-        Deque<Integer> q = new ArrayDeque<>();
-        q.add(e1);
-        q.add(e2);
-        List<List<Integer>> bfs = new ArrayList<>();
-        int level = 0;
-        while (!q.isEmpty()) {
-            int n = q.size();
-            bfs.add(new ArrayList<>());
-            for (int i = 0; i < n; i++) {
-                int v = q.pollFirst();
-                if (mkd[v]) {
-                    continue;
-                }
-                mkd[v] = true;
-                bfs.get(level).add(v);
-                for (int w : graph.getNeighbors(v)) {
-                    q.addLast(w);
-                }
-            }
-            level++;
-        }
-        bfs.remove(bfs.size() - 1);
+        List<List<Integer>> bfs = breadthFirstSearch(graph, e1, e2);
 
         // TODO: make graphs 1-indexed!
         Group group = new Group(new Permutation(new Cycle(e1 + 1, e2 + 1)));
 
-        for (level = 1; level < bfs.size(); level++) {
+        for (int level = 1; level < bfs.size(); level++) {
             List<Permutation> generators = new ArrayList<>();
 
             Map<Tuple, List<Integer>> f = new HashMap<>(); // inverse of father map
@@ -186,7 +166,7 @@ public class DegreeGraphIsomorphism {
 
         // stabilize edges in last bfs layer
         Set<Tuple> edges = new HashSet<>();
-        level = bfs.size() - 1;
+        int level = bfs.size() - 1;
         for (int u : bfs.get(level)) {
             for (int v : bfs.get(level)) {
                 if (u < v && graph.isAdjacent(u, v)) {
@@ -231,8 +211,12 @@ public class DegreeGraphIsomorphism {
         }
 
         // TODO: add performance flag for edge check or add this logic to GraphIsomorphism
+        // precondition checks
         if (g.getNumEdges() == 0) {
             return h.getNumEdges() == 0;
+        }
+        if (!isConnected(g) || !isConnected(h)) {
+            throw new RuntimeException();
         }
 
         int u = 0, v = 0;

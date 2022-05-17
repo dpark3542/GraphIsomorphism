@@ -11,6 +11,9 @@ import GroupTheory.Utilities.GroupGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
+import static GraphTheory.Utilities.GraphConnectivity.getConnectedComponents;
+import static GraphTheory.Utilities.GraphConnectivity.isConnected;
+
 public final class GraphIsomorphism {
     private static FormalString graphToString(Graph graph) {
         int n = graph.getNumVertices();
@@ -37,6 +40,14 @@ public final class GraphIsomorphism {
         if (n <= 1) {
             return true;
         }
+
+        // TODO:
+//        if (!isConnected(g)) {
+//            List<Graph> c = getConnectedComponents(g), d = getConnectedComponents(h);
+//            if (c.size() != d.size()) {
+//                return false;
+//            }
+//        }
 
         // TODO: allow choice of group theory engine
         if (method == Method.Naive) {

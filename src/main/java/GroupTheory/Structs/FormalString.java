@@ -1,10 +1,9 @@
 package GroupTheory.Structs;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
-public class FormalString implements Iterable<Integer> {
+public class FormalString {
     private final int n;
     private final int[] map;
 
@@ -57,10 +56,5 @@ public class FormalString implements Iterable<Integer> {
             sb.append(']');
             return sb.toString();
         }
-    }
-
-    @Override
-    public Iterator<Integer> iterator() {
-        return Arrays.stream(map).iterator();
     }
 }

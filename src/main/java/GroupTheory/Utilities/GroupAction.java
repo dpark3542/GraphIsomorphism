@@ -1,9 +1,13 @@
 package GroupTheory.Utilities;
 
 import GroupTheory.Engines.GroupTheoryEngine;
-import GroupTheory.Structs.*;
+import GroupTheory.Structs.Group;
+import GroupTheory.Structs.ImplicitDomain;
+import GroupTheory.Structs.Permutation;
+import GroupTheory.Structs.Tuple;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class GroupAction {
     // https://cp-algorithms.com/combinatorics/binomial-coefficients.html#improved-implementation
@@ -90,6 +94,9 @@ public final class GroupAction {
         if (1 > k || k > n) {
             throw new IllegalArgumentException();
         }
+        if (k == 1) {
+            return g;
+        }
         if (k == n) {
             throw new IllegalArgumentException();
         }
@@ -108,9 +115,20 @@ public final class GroupAction {
         return new Group(generators);
     }
 
+    private static int modOffset(int x, int n) {
+        int y = x % n;
+        if (y == 0) {
+            y = n;
+        }
+        return y;
+    }
+
     public static Group pullbackAction(GroupTheoryEngine engine, Group g, int n, int k) {
         if (1 > k || k > n) {
             throw new IllegalArgumentException();
+        }
+        if (k == 1) {
+            return g;
         }
         if (k == n) {
             throw new IllegalArgumentException();
@@ -119,64 +137,26 @@ public final class GroupAction {
         List<Permutation> generators = new ArrayList<>();
 
         for (Permutation generator : g) {
-            List<List<Integer>> image = new ArrayList<>();
-            for (int i = 0; i <= n; i++) {
-                image.add(new ArrayList<>());
-            }
-
-            for (Cycle cycle : generator) {
-                int m = cycle.size();
-                List<List<Integer>> parsed = new ArrayList<>();
-                for (int i = 0; i < m; i++) {
-                    parsed.add(new ArrayList<>());
-                    for (int x : intToTuple(cycle.get(i), n, k)) {
-                        parsed.get(i).add(x);
-                    }
-                }
-
-                for (int i = 0; i < m; i++) {
-                    for (int j : parsed.get(i)) {
-                        if (image.get(j).isEmpty()) {
-                            image.set(j, new ArrayList<>(parsed.get((i + 1) % m)));
-                        }
-                        else {
-                            image.get(j).retainAll(parsed.get((i + 1) % m));
-                        }
-                    }
-                }
-            }
-
-            int[] permutation = new int[n + 1];
-            Set<Integer> s = new HashSet<>();
-            for (int i = 1; i <= n; i++) {
-                if (image.get(i).isEmpty()) {
-                    permutation[i] = i;
-                }
-                else {
-                    s.add(i);
-                }
-            }
-            while (!s.isEmpty()) {
-                boolean flag = false;
-                for (Iterator<Integer> it = s.iterator(); it.hasNext(); ) {
-                    int i = it.next();
-                    if (image.get(i).size() == 1) {
-                        flag = true;
-                        it.remove();
-                        permutation[i] = image.get(i).get(0);
-                        for (int j = 1; j <= n; j++) {
-                            image.get(j).remove((Integer) permutation[i]);
-                        }
-                    }
-                }
-                if (!flag) {
-                    throw new RuntimeException();
-                }
-            }
-
             List<Integer> p = new ArrayList<>();
             for (int i = 1; i <= n; i++) {
-                p.add(permutation[i]);
+                List<Integer> a = new ArrayList<>(), q = new ArrayList<>();
+                for (int j = 1; j <= k - 1; j++) {
+                    a.add(modOffset(i + j, n));
+                }
+                a.add(i);
+                q.add(tupleToInt(new Tuple(a), n, k));
+                a.set(k - 1, modOffset(i + k, n));
+                q.add(tupleToInt(new Tuple(a), n, k));
+                List<Integer> im = engine.act(q, generator);
+                Tuple t = intToTuple(im.get(0), n, k), u = intToTuple(im.get(1), n, k);
+                List<Integer> ul = new ArrayList<>();
+                u.iterator().forEachRemaining(ul::add);
+                for (int x : t) {
+                    if (!ul.contains(x)) {
+                        p.add(x);
+                        break;
+                    }
+                }
             }
             generators.add(engine.listToPermutation(p));
         }

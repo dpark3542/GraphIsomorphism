@@ -147,8 +147,15 @@ public class GAP implements GroupTheoryEngine {
         if (list.isEmpty()) {
             throw new RuntimeException();
         }
-
         int n = list.size();
+        boolean[] mkd = new boolean[n];
+        for (int x : list) {
+            if (mkd[x - 1]) {
+                throw new RuntimeException();
+            }
+            mkd[x - 1] = true;
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("SortingPerm([");
         for (int i = 0; i < n - 1; i++) {

@@ -43,6 +43,11 @@ class StringIsomorphismTest {
         assertEquals("Group((3,4))", coset.group().toString());
         assertTrue(coset.element().isIdentity());
 
+        g = new Group(new Permutation(new Cycle(1, 2)), new Permutation(new Cycle(3, 4)));
+        coset = si.getIsomorphismCoset(new FormalString(1, 2, 1, 2), new FormalString(2, 1, 2, 1), g);
+        assertTrue(coset.group().isTrivial());
+        assertEquals(coset.element().toString(), "(1,2)(3,4)");
+
         gap.close();
     }
 }

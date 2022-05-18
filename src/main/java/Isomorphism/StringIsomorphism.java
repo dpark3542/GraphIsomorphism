@@ -88,13 +88,9 @@ public class StringIsomorphism {
         if (!engine.isTransitive(g, d)) {
             List<Domain> orbits = engine.getOrbits(g, d);
             for (Domain orbit : orbits) {
-                Coset tmp = luks(new Coset(g, new Permutation()), orbit, t);
-                if (tmp == null) {
-                    return null;
-                }
-                g = tmp.group();
+                c = luks(c, orbit, t);
             }
-            return new Coset(g, new Permutation());
+            return c;
         }
 
         Group delta = engine.getMinimalBlockSystemStabilizer(g, d);

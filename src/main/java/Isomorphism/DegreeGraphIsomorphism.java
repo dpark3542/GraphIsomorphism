@@ -71,8 +71,8 @@ public class DegreeGraphIsomorphism {
             }
 
             Set<Tuple> edges = new HashSet<>();
-            for (int u : bfs.get(level)) {
-                for (int v : bfs.get(level)) {
+            for (int u : bfs.get(level - 1)) {
+                for (int v : bfs.get(level - 1)) {
                     if (u < v && graph.isAdjacent(u, v)) {
                         // TODO: make graphs 1-indexed!
                         edges.add(new Tuple(u + 1, v + 1));
@@ -89,7 +89,7 @@ public class DegreeGraphIsomorphism {
 
             // image of pi
             Group image = group;
-            for (int t = 1; t <= d; t++) {
+            for (int t = 1; t <= d && t <= bfs.get(level - 1).size(); t++) {
                 // TODO: use binomial(bfs.get(level - 1).size(), t) memory instead
                 List<Integer> l = new ArrayList<>(binomial(2 * n + 2, t));
                 for (Tuple tuple : new ImplicitDomain(2 * n + 2, t)) {
@@ -176,28 +176,25 @@ public class DegreeGraphIsomorphism {
             }
         }
 
-        for (int t = 1; t <= d; t++) {
-            // TODO: use binomial(bfs.get(level - 1).size(), t) memory instead
-            List<Integer> l = new ArrayList<>(binomial(2 * n + 2, t));
-            for (Tuple tuple : new ImplicitDomain(2 * n + 2, t)) {
-                int offset = 0;
-                if (t == 2 && edges.contains(tuple)) {
-                    offset = 2 * n + 2;
-                }
-
-                l.add(1 + offset);
+        List<Integer> l = new ArrayList<>(binomial(2 * n + 2, 2));
+        for (Tuple tuple : new ImplicitDomain(2 * n + 2, 2)) {
+            if (edges.contains(tuple)) {
+                l.add(2);
             }
-
-            FormalString s = new FormalString(l);
-            StringIsomorphism si = new StringIsomorphism(engine);
-            Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, group, 2 * n + 2, t));
-
-            if (coset == null || !coset.element().isIdentity()) {
-                throw new RuntimeException();
+            else {
+                l.add(1);
             }
-
-            group = pullbackAction(engine, coset.group(), 2 * n + 2, t);
         }
+
+        FormalString s = new FormalString(l);
+        StringIsomorphism si = new StringIsomorphism(engine);
+        Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, group, 2 * n + 2, 2));
+
+        if (coset == null || !coset.element().isIdentity()) {
+            throw new RuntimeException();
+        }
+
+        group = pullbackAction(engine, coset.group(), 2 * n + 2, 2);
 
         return group;
     }

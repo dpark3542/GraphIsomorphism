@@ -23,7 +23,7 @@ public interface GroupTheoryEngine {
      * Gives image of each number in list under permutation.
      * Important: different from permute.
      *
-     * @param t list
+     * @param list list
      * @param p permutation
      * @return image
      */

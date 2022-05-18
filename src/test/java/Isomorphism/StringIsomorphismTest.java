@@ -3,6 +3,7 @@ package Isomorphism;
 import GroupTheory.Engines.GAP;
 import GroupTheory.Engines.GroupTheoryEngine;
 import GroupTheory.Structs.*;
+import GroupTheory.Utilities.GroupGenerator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,6 +48,11 @@ class StringIsomorphismTest {
         coset = si.getIsomorphismCoset(new FormalString(1, 2, 1, 2), new FormalString(2, 1, 2, 1), g);
         assertTrue(coset.group().isTrivial());
         assertEquals(coset.element().toString(), "(1,2)(3,4)");
+
+        g = GroupGenerator.symmetricGroup(5);
+        coset = si.getIsomorphismCoset(new FormalString(1, 2, 3, 4, 5), new FormalString(5, 1, 2, 3, 4), g);
+        assertTrue(coset.group().isTrivial());
+        assertEquals(coset.element().toString(), "(1,2,3,4,5)");
 
         gap.close();
     }

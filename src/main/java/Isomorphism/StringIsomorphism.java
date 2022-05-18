@@ -65,7 +65,7 @@ public class StringIsomorphism {
         }
 
         if (!c.element().isIdentity()) {
-            Coset tmp = luks(new Coset(c.group(), new Permutation()), d, engine.permute(t, c.element()));
+            Coset tmp = luks(new Coset(c.group(), new Permutation()), d, engine.permute(t, engine.invert(c.element())));
             if (tmp == null) {
                 return null;
             }

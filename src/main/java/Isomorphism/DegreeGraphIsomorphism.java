@@ -91,6 +91,8 @@ public class DegreeGraphIsomorphism {
             Group image = group;
             for (int t = 1; t <= d && t <= bfs.get(level - 1).size(); t++) {
                 // TODO: use binomial(bfs.get(level - 1).size(), t) memory instead
+                boolean flag = false;
+                int last = 0;
                 List<Integer> l = new ArrayList<>(binomial(2 * n + 2, t));
                 for (Tuple tuple : new ImplicitDomain(2 * n + 2, t)) {
                     int offset = 0;
@@ -98,27 +100,38 @@ public class DegreeGraphIsomorphism {
                         offset = 2 * n + 2;
                     }
 
+                    int x;
                     if (f.containsKey(tuple)) {
-                        l.add(f.get(tuple).size() + 1 + offset);
+                        x = f.get(tuple).size() + 1 + offset;
                     }
                     else {
-                        l.add(1 + offset);
+                        x = 1 + offset;
+                    }
+                    l.add(x);
+                    if (last == 0) {
+                        last = x;
+                    }
+                    else if (x != last) {
+                        flag = true;
                     }
                 }
 
-                FormalString s = new FormalString(l);
-                StringIsomorphism si = new StringIsomorphism(engine);
-                Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, image, 2 * n + 2, t));
+                // TODO: add optimization parameter
+                if (flag) {
+                    FormalString s = new FormalString(l);
+                    StringIsomorphism si = new StringIsomorphism(engine);
+                    Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, image, 2 * n + 2, t));
 
-                // Image cannot be empty.
-                // By (4.2), iso(s, t) is a coset of iso(s, s). We are calling it when s = t, so we should get a group.
-                // Image of a homomorphism is a group anyway.
-                if (coset == null || !coset.element().isIdentity()) {
-                    throw new RuntimeException();
+                    // Image cannot be empty.
+                    // By (4.2), iso(s, t) is a coset of iso(s, s). We are calling it when s = t, so we should get a group.
+                    // Image of a homomorphism is a group anyway.
+                    if (coset == null || !coset.element().isIdentity()) {
+                        throw new RuntimeException();
+                    }
+
+                    // pull back image which acts on S_{\binom{V_i}{t}} to act on V_i
+                    image = pullbackAction(engine, coset.group(), 2 * n + 2, t);
                 }
-
-                // pull back image which acts on S_{\binom{V_i}{t}} to act on V_i
-                image = pullbackAction(engine, coset.group(), 2 * n + 2, t);
             }
 
             // pull back image which acts on V_i to act on V_{i+1}
@@ -176,25 +189,30 @@ public class DegreeGraphIsomorphism {
             }
         }
 
+        boolean flag = false;
         List<Integer> l = new ArrayList<>(binomial(2 * n + 2, 2));
         for (Tuple tuple : new ImplicitDomain(2 * n + 2, 2)) {
             if (edges.contains(tuple)) {
                 l.add(2);
+                flag = true;
             }
             else {
                 l.add(1);
             }
         }
 
-        FormalString s = new FormalString(l);
-        StringIsomorphism si = new StringIsomorphism(engine);
-        Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, group, 2 * n + 2, 2));
+        // TODO: add optimization parameter
+        if (flag) {
+            FormalString s = new FormalString(l);
+            StringIsomorphism si = new StringIsomorphism(engine);
+            Coset coset = si.getIsomorphismCoset(s, s, GroupAction.inducedAction(engine, group, 2 * n + 2, 2));
 
-        if (coset == null || !coset.element().isIdentity()) {
-            throw new RuntimeException();
+            if (coset == null || !coset.element().isIdentity()) {
+                throw new RuntimeException();
+            }
+
+            group = pullbackAction(engine, coset.group(), 2 * n + 2, 2);
         }
-
-        group = pullbackAction(engine, coset.group(), 2 * n + 2, 2);
 
         return group;
     }

@@ -8,12 +8,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Benchmark {
-    private static long test(int n, int m, Method method) throws IOException {
+    private static Graph getGraph(int n, int i) {
+        try {
+            return GraphParser.parseGraph(Files.readString(Path.of("src/test/resources/graphs/" + n + '_' + i + ".txt")));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static long test(int n, int m, Method method) {
         long start = System.nanoTime();
 
         Graph[] graphs = new Graph[m];
         for (int i = 1; i <= m; i++) {
-            graphs[i - 1] = GraphParser.parseGraph(Files.readString(Path.of("src/test/resources/graphs/" + n + '_' + i + ".txt")));
+            graphs[i - 1] = getGraph(n, i);
         }
 
         for (int i = 0; i < m; i++) {
@@ -34,7 +42,7 @@ public class Benchmark {
         return end - start;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         test(3, 2, Method.Nauty);
         test(3, 2, Method.Naive);
         test(3, 2, Method.Degree);
@@ -42,5 +50,9 @@ public class Benchmark {
         test(4, 6, Method.Nauty);
         test(4, 6, Method.Naive);
         test(4, 6, Method.Degree);
+
+        test(5, 21, Method.Nauty);
+        test(5, 21, Method.Naive);
+        test(5, 21, Method.Degree);
     }
 }

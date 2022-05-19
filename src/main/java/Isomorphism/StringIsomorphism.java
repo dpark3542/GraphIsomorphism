@@ -88,6 +88,9 @@ public class StringIsomorphism {
         if (!engine.isTransitive(g, d)) {
             List<Domain> orbits = engine.getOrbits(g, d);
             for (Domain orbit : orbits) {
+//                if (d.size() <= orbit.size()) {
+//                    throw new RuntimeException();
+//                }
                 c = luks(c, orbit, t);
             }
             return c;

@@ -19,8 +19,6 @@ public class GAP implements GroupTheoryEngine {
     private final BufferedReader in;
     private final PrintWriter out;
 
-    private static final String initialPrompt = " Try";
-    private static final String prompt = "gap> ";
     private static final String outFormat = "SetPrintFormattingStatus(\"*stdout*\", false);;";
 
     private static final Pattern permutationPattern = Pattern.compile("(\\([()\\d,]+\\)|\\(\\))"), cyclePattern = Pattern.compile("\\([\\d,]+\\)"), digitPattern = Pattern.compile("\\d+");
@@ -35,20 +33,17 @@ public class GAP implements GroupTheoryEngine {
         location += "gap";
         this.log = log;
 
+        String[] args = {location, "-q"};
+
         this.performance = performance;
 
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command(location);
+            processBuilder.command(args);
             process = processBuilder.start();
             in = new BufferedReader(new InputStreamReader(process.getInputStream()));
             out = new PrintWriter(process.getOutputStream());
 
-            // read initial input
-            String line = in.readLine();
-            while (!line.startsWith(initialPrompt)) {
-                line = in.readLine();
-            }
             // don't break GAP output into multiple lines
             out.println(outFormat);
             out.flush();
@@ -75,19 +70,24 @@ public class GAP implements GroupTheoryEngine {
 
     private String read() {
         try {
-            String line = in.readLine();
-            while (line.startsWith(prompt)) {
-                line = line.substring(5);
-            }
             // TODO: catch error
-            return line;
+            return in.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private boolean readBoolean() {
-        return Boolean.parseBoolean(read());
+        String s = read().trim();
+        if ("true".equals(s)) {
+            return true;
+        }
+        else if ("false".equals(s)) {
+            return false;
+        }
+        else {
+            throw new RuntimeException();
+        }
     }
 
     private int readInt() {

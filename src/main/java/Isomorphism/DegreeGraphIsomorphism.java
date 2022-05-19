@@ -139,38 +139,42 @@ public class DegreeGraphIsomorphism {
                 List<Cycle> pullback = new ArrayList<>();
                 generator.iterator().forEachRemaining(pullback::add);
 
-                Set<Tuple> s = new HashSet<>();
+                Set<Tuple> mkd = new HashSet<>();
                 for (Map.Entry<Tuple, List<Integer>> entry : f.entrySet()) {
                     Tuple key = entry.getKey();
                     List<Integer> value = entry.getValue();
 
-                    if (s.contains(key)) {
-                        continue;
-                    }
-
-                    List<Integer> list = new ArrayList<>();
-                    key.iterator().forEachRemaining(list::add);
-                    Tuple key2 = new Tuple(engine.act(list, generator));
-                    if (key.equals(key2)) {
-                        continue;
-                    }
-                    // permuted set of fathers should still be a valid set of fathers
-                    if (!f.containsKey(key2)) {
-                        throw new RuntimeException();
-                    }
-                    List<Integer> value2 = f.get(key2);
                     int m = value.size();
-                    if (value2.size() != m) {
-                        throw new RuntimeException();
+                    List<List<Integer>> p = new ArrayList<>();
+                    for (int i = 0; i < m; i++) {
+                        p.add(new ArrayList<>());
                     }
 
-                    s.add(key);
-                    s.add(key2);
+                    while (!mkd.contains(key)) {
+                        mkd.add(key);
 
-                    for (int i = 0; i < m; i++) {
-                        pullback.add(new Cycle(value.get(i), value2.get(i)));
+                        if (!f.containsKey(key)) {
+                            throw new RuntimeException();
+                        }
+
+                        for (int i = 0; i < m; i++) {
+                            p.get(i).add(value.get(i));
+                        }
+
+                        List<Integer> list = new ArrayList<>();
+                        key.iterator().forEachRemaining(list::add);
+
+                        key = new Tuple(engine.act(list, generator));
+                        value = f.get(key);
+                    }
+
+                    if (p.get(0).size() > 1) {
+                        for (int i = 0; i < m; i++) {
+                            pullback.add(new Cycle(p.get(i)));
+                        }
                     }
                 }
+
                 generators.add(new Permutation(pullback));
             }
 
